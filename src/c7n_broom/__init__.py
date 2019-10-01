@@ -3,7 +3,7 @@ import logging
 
 import pkg_resources
 
-from .base import C7nConfig, REGION_MAP
+from .base import REGION_MAP, C7nConfig
 
 
 try:
