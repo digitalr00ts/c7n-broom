@@ -5,15 +5,12 @@ Helper functions
 import json
 import logging
 import pathlib
-
-from typing import Dict, FrozenSet, Iterable, List
+from typing import Dict, FrozenSet, Iterable, List, Optional
 
 import boto3
 import botocore.exceptions
 import jmespath
-
 from pkg_resources import resource_filename
-
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -48,7 +45,7 @@ def get_region_names(partition: str = "aws") -> Dict[str, str]:
 
 
 def get_regions_accessible(
-    regions: Iterable = get_region_names(), session=boto3.Session()
+    profile: Optional[str] = None, session=None, regions: Iterable = get_region_names()
 ) -> FrozenSet[str]:
     """
     Obtains accessible regions.
@@ -64,6 +61,8 @@ def get_regions_accessible(
         AWS Regions
     """
     ret_regions: List[str] = list()
+    if not session:
+        session = boto3.Session(profile_name=profile)
 
     for region in regions:
         client = session.client("sts", region_name=region)
