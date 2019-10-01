@@ -6,7 +6,6 @@ import dataclasses
 import logging
 import os
 import pathlib
-
 from typing import Iterable, List, Optional, Set, Tuple, Union
 
 # import boto3
@@ -15,12 +14,11 @@ import c7n.config
 
 import c7n_broom.util
 
-
 _LOGGER = logging.getLogger(__name__)
 REGION_MAP = c7n_broom.util.get_region_names()
 
 
-@dataclasses.dataclass(eq=False)  # pylint: disable=too-many-instance-attributes
+@dataclasses.dataclass(eq=False)
 class C7nConfig(dict):
     """Configuration for c7n."""
 
