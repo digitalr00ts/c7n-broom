@@ -13,7 +13,6 @@ from typing import Iterable, List, Optional, Set, Tuple, Union
 import c7n.commands
 import c7n.config
 
-
 import c7n_broom.util
 
 
@@ -21,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 REGION_MAP = c7n_broom.util.get_region_names()
 
 
-@dataclasses.dataclass(eq=False)
+@dataclasses.dataclass(eq=False)  # pylint: disable=too-many-instance-attributes
 class C7nConfig(dict):
     """Configuration for c7n."""
 
@@ -70,7 +69,7 @@ class C7nConfig(dict):
 
         for k, v in c7n.config.Config.empty().items():
             if k not in dataclasses.asdict(self).keys():
-                _LOGGER.debug("Adding missing attribute {}:{}.", k, v)
+                _LOGGER.debug("Adding missing attribute %s:%s.", k, v)
                 setattr(self, k, v)
 
         c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)

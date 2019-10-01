@@ -70,7 +70,7 @@ def get_regions_accessible(
         try:
             client.get_caller_identity()
         except botocore.exceptions.ClientError:
-            _LOGGER.debug("Unable to access region {}.", region)
+            _LOGGER.debug("Unable to access region %s.", region)
         else:
             ret_regions.append(region)
 
