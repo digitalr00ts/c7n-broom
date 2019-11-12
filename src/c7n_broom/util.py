@@ -9,11 +9,11 @@ import pathlib
 from enum import Enum
 from typing import Dict, FrozenSet, Iterable, List, Optional
 
+from pkg_resources import resource_filename
+
 import boto3
 import botocore.exceptions
 import jmespath
-
-from pkg_resources import resource_filename
 
 
 _LOGGER = logging.getLogger(__name__)
