@@ -1,0 +1,39 @@
+---
+accounts:
+  empty_policies:
+    policies: []
+  none_policies:
+    policies:
+  none:
+  account_included:
+    policies:
+      include:
+        - account_included_policy
+  default_exclude:
+    policies:
+      include:
+        - account_included_policy
+        - default_excluded_policy
+  exclude_all:
+    policies:
+      include:
+        - default_excluded_policy
+      exclude:
+        - default_included_policy
+  account_included_none_exclude:
+    policies:
+      include:
+        - account_included_policy
+      exclude:
+  account_none_exclude_default:
+    policies:
+      include:
+      exclude:
+        - default_included_policy
+
+defaults:
+  policies:
+    include:
+      - default_included_policy
+    exclude:
+      - default_excluded_policy
