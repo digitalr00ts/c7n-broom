@@ -5,14 +5,27 @@ Helper functions
 import json
 import logging
 import pathlib
+
+from enum import Enum
 from typing import Dict, FrozenSet, Iterable, List, Optional
 
 import boto3
 import botocore.exceptions
 import jmespath
+
 from pkg_resources import resource_filename
 
+
 _LOGGER = logging.getLogger(__name__)
+
+
+class ExtendedEnum(Enum):
+    """ Add helper methods to Enums """
+
+    @classmethod
+    def values(cls):
+        """ Returns set of all values """
+        return {item.value for item in cls}
 
 
 def get_region_names(partition: str = "aws") -> Dict[str, str]:
