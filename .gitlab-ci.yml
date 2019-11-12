@@ -17,8 +17,8 @@ style:
   extends: .job_template
 sec:
   extends: .job_template
-pkg:
-  extends: .job_template
+#pkg:
+#  extends: .job_template
 py38:
   extends: .job_template
 py37:
