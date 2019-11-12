@@ -1,0 +1,5 @@
+[submodule "vendor/boto-remora"]
+	path = vendor/boto-remora
+	url = https://github.com/digitalr00ts/boto-remora.git
+	branch = master
+	shallow = true
