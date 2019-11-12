@@ -7,11 +7,11 @@ verify_ssl = true
 better_exceptions = {version = "*",index = "pypi"}
 pylint = "*"
 isort = {extras = ["pyproject"],version = "*"}
-mypy = "*"
-bandit = "*"
+notebook = "*"
+pytest = "*"
 
 [packages]
-c7n_broom = {editable = true,path = "."}
+c7n-broom = {editable = true,path = "."}
 
 [requires]
 # python_version = "3.7"
