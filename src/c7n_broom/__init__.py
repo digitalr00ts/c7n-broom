@@ -1,9 +1,13 @@
 """ c7n Broom top level """
-import logging
+import logging as _logging
 
 import pkg_resources
 
-from .base import REGION_MAP, C7nConfig
+from . import config
+from .base import REGION_MAP
+
+from c7n_broom.config import C7nConfig
+
 
 try:
     __version__ = pkg_resources.get_distribution(__name__).version
@@ -11,12 +15,13 @@ except pkg_resources.DistributionNotFound:
     __version__ = ""
 
 
-__all__ = ["C7nConfig"]
+__all__ = []
 
-logging.getLogger(__name__).addHandler(logging.NullHandler())
-logging.getLogger(__name__).setLevel(logging.DEBUG)
-logging.getLogger("custodian").setLevel(logging.INFO)
-logging.getLogger("botocore").setLevel(logging.ERROR)
-logging.getLogger("urllib3").setLevel(logging.ERROR)
-logging.getLogger("s3transfer").setLevel(logging.ERROR)
-logging.getLogger("urllib3").setLevel(logging.ERROR)
+_logging.getLogger(__name__).addHandler(_logging.NullHandler())
+_logging.getLogger(__name__).setLevel(_logging.DEBUG)
+_logging.getLogger("custodian").setLevel(_logging.INFO)
+_logging.getLogger("botocore").setLevel(_logging.ERROR)
+_logging.getLogger("urllib3").setLevel(_logging.ERROR)
+_logging.getLogger("s3transfer").setLevel(_logging.ERROR)
+_logging.getLogger("urllib3").setLevel(_logging.ERROR)
+_logging.getLogger("viper").setLevel(_logging.ERROR)
