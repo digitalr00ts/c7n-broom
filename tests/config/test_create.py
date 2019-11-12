@@ -50,7 +50,9 @@ def test_020_merge_policies(data):
         for name, policies in EXPECTED_POLICIES_DATA.items()
     ],
 )
-def test_100_c7nconfigs(configs, name, policies):  # pylint: disable=redefined-outer-name
+def test_100_c7nconfigs(
+    configs, name, policies
+):  # pylint: disable=redefined-outer-name
     _, c7nconfigs = configs
     c7n_configs = list(filter(lambda c7nconfig: c7nconfig.profile == name, c7nconfigs))
     assert len(c7n_configs) == len(policies)
