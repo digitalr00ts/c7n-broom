@@ -30,7 +30,7 @@ def _create_dictset(
 
 
 def _merge_policies(
-    account_policies, default_policies, keys=PolicyKeys.values()
+    account_policies, default_policies, keys=frozenset(PolicyKeys.values())
 ) -> Set[str]:
     """ Combine account and default included and excluded policies. """
     account_policies_ = _create_dictset(account_policies, keys)
@@ -38,7 +38,7 @@ def _merge_policies(
 
     policies_sets = {
         policy_key: account_policies_[policy_key].union(default_policies_[policy_key])
-        for policy_key in PolicyKeys.values()
+        for policy_key in keys
     }
 
     return policies_sets[
