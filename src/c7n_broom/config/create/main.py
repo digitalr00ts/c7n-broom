@@ -65,8 +65,8 @@ def account_c7nconfigs(
 
 def c7nconfigs(config):
     """ Create c7n configs for every policy and account """
-    accounts = config.sub("accounts")
-    defaults = config.sub("defaults")
+    accounts = config.get("accounts")
+    defaults = config.get("defaults")
 
     if not accounts:
         _LOGGER.critical("No accounts in config.")
@@ -75,6 +75,6 @@ def c7nconfigs(config):
             lambda account_name: account_c7nconfigs(
                 account_name, accounts.get(account_name), defaults
             ),
-            accounts.all_keys(),
+            accounts.keys(),
         )
     )
