@@ -51,12 +51,12 @@ def _merge_policies(
 def account_c7nconfigs(
     name: str,
     account_settings: Union[Vyper, Dict[str, Any]],
-    defaults: Optional[Union[Vyper, Dict[str, Any]]] = None,
+    global_settings: Optional[Union[Vyper, Dict[str, Any]]] = None,
 ):
     """ Create c7n config per policy for account. """
     policies = _merge_policies(
         account_settings.get("policies") if account_settings else dict(),
-        defaults.get("policies") if defaults else dict(),
+        global_settings.get("policies") if global_settings else dict(),
     )
     _LOGGER.debug("Creating policies: %s %s", name, policies)
     # TODO: Get and pass available regions
@@ -66,14 +66,14 @@ def account_c7nconfigs(
 def c7nconfigs(config):
     """ Create c7n configs for every policy and account """
     accounts = config.get("accounts")
-    defaults = config.get("defaults")
+    global_settings = config.get("global")
 
     if not accounts:
         _LOGGER.critical("No accounts in config.")
     return itertools.chain.from_iterable(
         map(
             lambda account_name: account_c7nconfigs(
-                account_name, accounts.get(account_name), defaults
+                account_name, accounts.get(account_name), global_settings
             ),
             accounts.keys(),
         )
