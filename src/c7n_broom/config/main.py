@@ -67,7 +67,7 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
 #         map(lambda account: create_config_per_policy(account), accounts)
 #     )
 @dataclasses.dataclass(eq=False)
-class C7nConfig(tuple):  # pylint: disable=too-many-instance-attributes
+class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attributes
     """Configuration for c7n."""
 
     profile: str = os.environ.get("AWS_PROFILE", "")
