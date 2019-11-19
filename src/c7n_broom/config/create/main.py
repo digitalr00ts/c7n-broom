@@ -66,8 +66,12 @@ def account_c7nconfigs(
         boto_remora.aws.Ec2(name).available_regions if not skip_regions else list()
     )
     _LOGGER.debug("Creating policies: %s %s", name, policies)
+    # TODO: remove hardcoded disabling metrics and move to broom config
     return map(
-        lambda policy: C7nConfig(name, configs=[policy], regions=regions), policies
+        lambda policy: C7nConfig(
+            name, configs=[policy], regions=regions, metrics_enabled=False
+        ),
+        policies,
     )
 
 
