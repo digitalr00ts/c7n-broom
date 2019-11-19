@@ -5,9 +5,9 @@ verify_ssl = true
 
 [dev-packages]
 better_exceptions = {version = "*",index = "pypi"}
-pylint = "*"
 isort = {extras = ["pyproject"],version = "*"}
 notebook = "*"
+pylint = "*"
 pytest = "*"
 
 [packages]
@@ -17,3 +17,4 @@ c7n-broom = {editable = true,path = "."}
 # python_version = "3.7"
 
 [scripts]
+install = "pipenv install --dev --skip-lock"
