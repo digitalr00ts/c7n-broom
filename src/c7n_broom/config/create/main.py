@@ -71,7 +71,7 @@ def account_c7nconfigs(
     )
 
 
-def _authed_accounts_data(config, skip_unauthed: bool):
+def _authed_accounts_data(accounts, skip_unauthed: bool):
     def is_authed(profile, region="us-east-1") -> bool:
         return (
             boto_remora.aws.Sts(
@@ -82,11 +82,9 @@ def _authed_accounts_data(config, skip_unauthed: bool):
         )
 
     accounts_authed_data = dict(
-        filter(lambda account: is_authed(account[0]), config.get("accounts").items())
+        filter(lambda account: is_authed(account[0]), accounts.items())
     )
-    accounts_not_authed = set(config.get("accounts").keys()).difference(
-        accounts_authed_data.keys()
-    )
+    accounts_not_authed = set(accounts.keys()).difference(accounts_authed_data.keys())
     if accounts_not_authed:
         msg = f"Not all accounts can access the AWS API {accounts_not_authed}."
         if skip_unauthed:
@@ -98,13 +96,20 @@ def _authed_accounts_data(config, skip_unauthed: bool):
 
 def c7nconfigs(config, skip_unauthed: bool = False, skip_auth_check: bool = False):
     """ Create c7n configs for every policy and account """
-
-    accounts = (
-        _authed_accounts_data(config, skip_unauthed)
-        if not skip_auth_check
-        else config.get("accounts")
-    )
     global_settings = config.get("global")
+    accounts = config.get("accounts")
+    if (
+        len(accounts) == 1
+        and isinstance(accounts.get("ALL"), bool)
+        and accounts.get("ALL") is True
+    ):
+        import botocore  # pylint: disable=import-outside-toplevel
+
+        accounts = {
+            profile: None for profile in botocore.session.Session().available_profiles
+        }
+    if not skip_auth_check:
+        accounts = _authed_accounts_data(accounts, skip_unauthed)
 
     if not accounts:
         _LOGGER.critical("No accounts in config.")
