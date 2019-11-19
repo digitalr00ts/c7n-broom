@@ -123,7 +123,7 @@ def c7nconfigs(config, skip_unauthed: bool = False, skip_auth_check: bool = Fals
                 account_name,
                 accounts.get(account_name),
                 global_settings,
-                skip_regions=skip_auth_check or skip_unauthed,
+                skip_regions=skip_auth_check,
             ),
             accounts.keys(),
         )
