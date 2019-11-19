@@ -54,13 +54,17 @@ def account_c7nconfigs(
     name: str,
     account_settings: Union[Vyper, Dict[str, Any]],
     global_settings: Optional[Union[Vyper, Dict[str, Any]]] = None,
+    skip_regions: bool = False,
 ):
     """ Create c7n config per policy for account. """
+    # TODO: remove skip regions in favor of setting regions in broom config
     policies = _merge_policies(
         account_settings.get("policies") if account_settings else dict(),
         global_settings.get("policies") if global_settings else dict(),
     )
-    regions = boto_remora.aws.Ec2(name).available_regions
+    regions = (
+        boto_remora.aws.Ec2(name).available_regions if not skip_regions else list()
+    )
     _LOGGER.debug("Creating policies: %s %s", name, policies)
     return map(
         lambda policy: C7nConfig(name, configs=[policy], regions=regions), policies
@@ -107,7 +111,10 @@ def c7nconfigs(config, skip_unauthed: bool = False, skip_auth_check: bool = Fals
     return itertools.chain.from_iterable(
         map(
             lambda account_name: account_c7nconfigs(
-                account_name, accounts.get(account_name), global_settings
+                account_name,
+                accounts.get(account_name),
+                global_settings,
+                skip_regions=skip_auth_check or skip_unauthed,
             ),
             accounts.keys(),
         )
