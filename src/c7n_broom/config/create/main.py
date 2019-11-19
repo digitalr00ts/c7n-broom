@@ -70,7 +70,9 @@ def account_c7nconfigs(
 def _authed_accounts_data(config, skip_unauthed: bool):
     def is_authed(profile, region="us-east-1") -> bool:
         return (
-            boto_remora.aws.Sts(profile, region_name=region).is_region_accessible()
+            boto_remora.aws.Sts(
+                profile, region_name=region
+            ).is_default_region_accessible()
             if boto_remora.aws.AwsBase().is_profile_available(profile)
             else False
         )
