@@ -92,7 +92,7 @@ def _authed_accounts_data(accounts, skip_unauthed: bool):
     if accounts_not_authed:
         msg = f"Not all accounts can access the AWS API {accounts_not_authed}."
         if skip_unauthed:
-            logging.warning(msg)
+            _LOGGER.warning(msg)
         else:
             raise RuntimeError(msg)
     return accounts_authed_data
