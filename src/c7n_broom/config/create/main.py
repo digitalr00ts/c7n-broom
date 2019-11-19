@@ -60,9 +60,11 @@ def account_c7nconfigs(
         account_settings.get("policies") if account_settings else dict(),
         global_settings.get("policies") if global_settings else dict(),
     )
+    regions = boto_remora.aws.Ec2(name).available_regions
     _LOGGER.debug("Creating policies: %s %s", name, policies)
-    # TODO: Get and pass available regions
-    return map(lambda policy: C7nConfig(name, configs=[policy]), policies)
+    return map(
+        lambda policy: C7nConfig(name, configs=[policy], regions=regions), policies
+    )
 
 
 def _authed_accounts_data(config, skip_unauthed: bool):
