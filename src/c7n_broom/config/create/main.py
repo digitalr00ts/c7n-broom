@@ -80,7 +80,7 @@ def _authed_accounts_data(accounts, skip_unauthed: bool):
         return (
             boto_remora.aws.Sts(
                 profile, region_name=region
-            ).is_default_region_accessible()
+            ).is_session_region_accessible()
             if boto_remora.aws.AwsBase().is_profile_available(profile)
             else False
         )
