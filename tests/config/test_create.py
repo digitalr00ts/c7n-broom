@@ -20,7 +20,9 @@ def configs(request):
     if not vconfig:
         data_path = Path(__file__).parent.joinpath("_data")
         vconfig = c7n_broom.config.get_config("config", path=data_path)
-        c7nconfigs = list(c7n_broom.config.create.c7nconfigs(vconfig))
+        c7nconfigs = list(
+            c7n_broom.config.create.c7nconfigs(vconfig, skip_auth_check=True)
+        )
     return vconfig, c7nconfigs
 
 

@@ -4,6 +4,8 @@ import logging
 
 from typing import Any, Dict, Iterable, Optional, Set, Union
 
+import boto_remora.aws
+
 from vyper import Vyper
 
 from c7n_broom.config.main import C7nConfig
@@ -63,9 +65,37 @@ def account_c7nconfigs(
     return map(lambda policy: C7nConfig(name, configs=[policy]), policies)
 
 
-def c7nconfigs(config):
+def _authed_accounts_data(config, skip_unauthed: bool):
+    def is_authed(profile, region="us-east-1") -> bool:
+        return (
+            boto_remora.aws.Sts(profile, region_name=region).is_region_accessible()
+            if boto_remora.aws.AwsBase().is_profile_available(profile)
+            else False
+        )
+
+    accounts_authed_data = dict(
+        filter(lambda account: is_authed(account[0]), config.get("accounts").items())
+    )
+    accounts_not_authed = set(config.get("accounts").keys()).difference(
+        accounts_authed_data.keys()
+    )
+    if accounts_not_authed:
+        msg = f"Not all accounts can access the AWS API {accounts_not_authed}."
+        if skip_unauthed:
+            logging.warning(msg)
+        else:
+            raise RuntimeError(msg)
+    return accounts_authed_data
+
+
+def c7nconfigs(config, skip_unauthed: bool = False, skip_auth_check: bool = False):
     """ Create c7n configs for every policy and account """
-    accounts = config.get("accounts")
+
+    accounts = (
+        _authed_accounts_data(config, skip_unauthed)
+        if not skip_auth_check
+        else config.get("accounts")
+    )
     global_settings = config.get("global")
 
     if not accounts:
