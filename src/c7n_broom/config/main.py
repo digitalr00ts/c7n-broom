@@ -97,17 +97,15 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
     debug: bool = False
     # verbose: bool = True
 
+    account_id: Optional[str] = dataclasses.field(default=None)
+    assume_role: Optional[str] = dataclasses.field(default=None)
+    external_id: Optional[str] = dataclasses.field(default=None)
+    log_group: Optional[str] = dataclasses.field(default=None)
+    authorization_file: Optional[str] = dataclasses.field(default=None)
+    tracer: str = dataclasses.field(default="default")
+
     # IDK, but c7n will throw errors w/o it.
     vars: Optional[List] = None
-
-    # account_id: Optional[str] = field(default=None)
-    # assume_role: Optional[str] = field(default=None)
-    # external_id: Optional[str] = field(default=None)
-    # log_group: Optional[str] = field(default=None)
-    # authorization_file: Optional[str] = field(default=None)
-    # tracer: str = field(default="default")
-
-    # data: Dict[str, Any] = dataclasses.field(default_factory=dict, init=False)
 
     def __post_init__(self):
         if not self.profile:
