@@ -31,18 +31,18 @@ def configs(request):
 )
 def test_010_create_dictset(data):
     keys = ["Key1", "Key2"]
-    rtn = c7n_broom.config.create.main._create_dictset(data, keys)
+    rtn = c7n_broom.config.create.policies._create_dictset(data, keys)
     assert sorted(list(rtn.keys())) == sorted(keys)
 
 
 @pytest.mark.parametrize(
     "data", [pytest.param(value, id=id_) for id_, value in MERGE_POLICY_DATA.items()]
 )
-def test_020_merge_policies(data):
-    policies = c7n_broom.config.create.main._merge_policies(
+def test_020_filter_policies(data):
+    policies = c7n_broom.config.create.policies.filter_policies(
         data.get("account"), data.get("defaults")
     )
-    assert policies == data["EXPECTED"]
+    assert set(policies) == data["EXPECTED"]
 
 
 @pytest.mark.parametrize(

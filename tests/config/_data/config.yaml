@@ -37,3 +37,4 @@ global:
       - default_included_policy
     exclude:
       - default_excluded_policy
+    path: imaginary\path

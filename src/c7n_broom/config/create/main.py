@@ -2,52 +2,17 @@
 import itertools
 import logging
 
-from typing import Any, Dict, Iterable, Optional, Set, Union
+from typing import Any, Dict, Optional, Union
 
 import boto_remora.aws
 
 from vyper import Vyper
 
+from c7n_broom.config.create.policies import get_policy_files
 from c7n_broom.config.main import C7nConfig
-from c7n_broom.util import ExtendedEnum
 
 
 _LOGGER = logging.getLogger(__name__)
-
-
-class PolicyKeys(ExtendedEnum):
-    """ Types of policies """
-
-    INCLUDE = "include"
-    EXCLUDE = "exclude"
-
-
-def _create_dictset(
-    data: Dict[str, Iterable[str]], keys: Iterable[str]
-) -> Dict[str, Set[str]]:
-    """ Returns dict of sets for keys in data """
-    return {
-        key: set(data.get(key) if (data and data.get(key)) else set()) for key in keys
-    }
-
-
-def _merge_policies(
-    account_policies, default_policies, keys=frozenset(PolicyKeys.values())
-) -> Set[str]:
-    """ Combine account and default included and excluded policies. """
-    account_policies_ = _create_dictset(account_policies, keys)
-    default_policies_ = _create_dictset(default_policies, keys)
-
-    policies_sets = {
-        policy_key: account_policies_[policy_key].union(default_policies_[policy_key])
-        for policy_key in keys
-    }
-
-    return policies_sets[
-        PolicyKeys.INCLUDE.value  # pylint: disable=no-member
-    ].difference(
-        policies_sets[PolicyKeys.EXCLUDE.value]  # pylint: disable=no-member
-    )
 
 
 def account_c7nconfigs(
@@ -58,7 +23,7 @@ def account_c7nconfigs(
 ):
     """ Create c7n config per policy for account. """
     # TODO: remove skip regions in favor of setting regions in broom config
-    policies = _merge_policies(
+    policies = get_policy_files(
         account_settings.get("policies") if account_settings else dict(),
         global_settings.get("policies") if global_settings else dict(),
     )
