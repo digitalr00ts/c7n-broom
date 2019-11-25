@@ -63,12 +63,17 @@ def _authed_accounts_data(accounts, skip_unauthed: bool):
     return accounts_authed_data
 
 
-def c7nconfigs(config, skip_unauthed: bool = False, skip_auth_check: bool = False):
+def c7nconfigs(
+    config: Union[Vyper, Dict[str, Any]],
+    skip_unauthed: bool = False,
+    skip_auth_check: bool = False,
+):
     """ Create c7n configs for every policy and account """
     global_settings = config.get("global")
     accounts = config.get("accounts")
     if (
-        len(accounts) == 1
+        accounts is not None
+        and len(accounts) == 1
         and isinstance(accounts.get("ALL"), bool)
         and accounts.get("ALL") is True
     ):
