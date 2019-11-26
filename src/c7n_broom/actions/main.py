@@ -50,9 +50,7 @@ def query(
 
     report_settings = dataclasses.replace(c7n_config)
     report_settings.days = report_minutes / MINUTES_IN_DAY
-    datafile = (
-        Path(data_dir).joinpath(profile_policies_str).with_suffix(".json")
-    )
+    datafile = Path(data_dir).joinpath(profile_policies_str).with_suffix(".json")
     with datafile.open(mode="wt") as data_fd:
         report_settings.raw = data_fd
         c7n.commands.report(report_settings)  # pylint: disable=no-value-for-parameter
