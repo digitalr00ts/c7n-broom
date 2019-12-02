@@ -1,11 +1,12 @@
 """ Main of c7n_broom.config.main """
 import itertools
 import logging
-
+from os import PathLike
+from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 import boto_remora.aws
-
+import yaml
 from vyper import Vyper
 
 from c7n_broom.config.create.policies import get_policy_files
@@ -15,6 +16,19 @@ from c7n_broom.config.main import C7nConfig
 _LOGGER = logging.getLogger(__name__)
 
 
+def _get_policy_resource(policy_file: PathLike) -> Optional[str]:
+    """
+    Returns resource type if the resources are the same across the policies in the policy file.
+    Otherwise returns None
+    """
+    policy_file = Path(policy_file)
+    policyfile_data = yaml.load(policy_file.read_bytes())
+    policy_resources = set(
+        map(lambda policy_: policy_.get("resource"), policyfile_data.get("policies"))
+    )
+    return policy_resources[0] if len(policy_resources) == 1 else None
+
+
 def account_c7nconfigs(
     name: str,
     account_settings: Union[Vyper, Dict[str, Any]],
@@ -22,19 +36,21 @@ def account_c7nconfigs(
     skip_regions: bool = False,
 ):
     """ Create c7n config per policy for account. """
-    # TODO: remove skip regions in favor of setting regions in broom config
     policies = get_policy_files(
         account_settings.get("policies") if account_settings else dict(),
         global_settings.get("policies") if global_settings else dict(),
     )
-    regions = (
-        boto_remora.aws.Ec2(name).available_regions if not skip_regions else list()
-    )
+    # TODO: remove skip regions in favor of setting regions in broom config
+    regions = boto_remora.aws.Ec2(name).available_regions if not skip_regions else list()
     _LOGGER.debug("Creating policies: %s %s", name, policies)
     # TODO: remove hardcoded disabling metrics and move to broom config
     return map(
-        lambda policy: C7nConfig(
-            name, configs=[policy], regions=regions, metrics_enabled=False
+        lambda policy_name: C7nConfig(
+            name,
+            configs=tuple(policy_name),
+            regions=regions,
+            resource_type=_get_policy_resource(policy_name),
+            metrics_enabled=False,
         ),
         policies,
     )
@@ -43,16 +59,12 @@ def account_c7nconfigs(
 def _authed_accounts_data(accounts, skip_unauthed: bool):
     def is_authed(profile, region="us-east-1") -> bool:
         return (
-            boto_remora.aws.Sts(
-                profile, region_name=region
-            ).is_session_region_accessible
+            boto_remora.aws.Sts(profile, region_name=region).is_session_region_accessible
             if boto_remora.aws.AwsBase().is_profile_available(profile)
             else False
         )
 
-    accounts_authed_data = dict(
-        filter(lambda account: is_authed(account[0]), accounts.items())
-    )
+    accounts_authed_data = dict(filter(lambda account: is_authed(account[0]), accounts.items()))
     accounts_not_authed = set(accounts.keys()).difference(accounts_authed_data.keys())
     if accounts_not_authed:
         msg = f"Not all accounts can access the AWS API {accounts_not_authed}."
@@ -79,9 +91,7 @@ def c7nconfigs(
     ):
         import botocore  # pylint: disable=import-outside-toplevel
 
-        accounts = {
-            profile: None for profile in botocore.session.Session().available_profiles
-        }
+        accounts = {profile: None for profile in botocore.session.Session().available_profiles}
     if not skip_auth_check:
         accounts = _authed_accounts_data(accounts, skip_unauthed)
 
