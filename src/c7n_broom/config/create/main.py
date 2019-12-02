@@ -7,10 +7,9 @@ from typing import Any, Dict, Optional, Union
 
 import boto_remora.aws
 import yaml
-from vyper import Vyper
-
 from c7n_broom.config.create.policies import get_policy_files
 from c7n_broom.config.main import C7nConfig
+from vyper import Vyper
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -22,11 +21,14 @@ def _get_policy_resource(policy_file: PathLike) -> Optional[str]:
     Otherwise returns None
     """
     policy_file = Path(policy_file)
-    policyfile_data = yaml.load(policy_file.read_bytes())
+    policyfile_data = yaml.load(policy_file.read_bytes()) if policy_file.is_file() else dict()
     policy_resources = set(
-        map(lambda policy_: policy_.get("resource"), policyfile_data.get("policies"))
+        map(lambda policy_: policy_.get("resource"), policyfile_data.get("policies", tuple()))
     )
-    return policy_resources[0] if len(policy_resources) == 1 else None
+    rtn = policy_resources.pop() if len(policy_resources) == 1 else None
+    if not rtn:
+        _LOGGER.warning("No single resource type found in %s", policy_file)
+    return rtn
 
 
 def account_c7nconfigs(
@@ -47,7 +49,7 @@ def account_c7nconfigs(
     return map(
         lambda policy_name: C7nConfig(
             name,
-            configs=tuple(policy_name),
+            configs=(policy_name,),
             regions=regions,
             resource_type=_get_policy_resource(policy_name),
             metrics_enabled=False,
