@@ -21,7 +21,9 @@ def _get_policy_resource(policy_file: PathLike) -> Optional[str]:
     Otherwise returns None
     """
     policy_file = Path(policy_file)
-    policyfile_data = yaml.load(policy_file.read_bytes()) if policy_file.is_file() else dict()
+    policyfile_data = (
+        yaml.safe_load(policy_file.read_bytes()) if policy_file.is_file() else dict()
+    )
     policy_resources = set(
         map(lambda policy_: policy_.get("resource"), policyfile_data.get("policies", tuple()))
     )
