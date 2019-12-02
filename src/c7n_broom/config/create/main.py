@@ -7,9 +7,10 @@ from typing import Any, Dict, Optional, Union
 
 import boto_remora.aws
 import yaml
+from vyper import Vyper
+
 from c7n_broom.config.create.policies import get_policy_files
 from c7n_broom.config.main import C7nConfig
-from vyper import Vyper
 
 
 _LOGGER = logging.getLogger(__name__)

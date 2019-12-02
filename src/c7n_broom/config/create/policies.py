@@ -4,8 +4,9 @@ from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Set, Union
 
-from c7n_broom.util import ExtendedEnum
 from vyper import Vyper
+
+from c7n_broom.util import ExtendedEnum
 
 
 _LOGGER = logging.getLogger(__name__)

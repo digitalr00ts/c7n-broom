@@ -2,9 +2,9 @@
 # pylint: disable=protected-access,missing-function-docstring
 from pathlib import Path
 
-import c7n_broom
-
 import pytest
+
+import c7n_broom
 from tests.config._data.contants import (
     DICT_OF_KEYS_DATA,
     EXPECTED_POLICIES_DATA,
