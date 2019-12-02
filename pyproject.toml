@@ -14,4 +14,4 @@ lines_after_imports = 2
 lines_between_types = 0
 multi_line_output = 3
 not_skip = '__init__.py'
-known_first_party = 'c7n_broom'
+known_third_party = 'c7n_broom'

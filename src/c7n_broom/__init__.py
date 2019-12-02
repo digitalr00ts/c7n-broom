@@ -2,7 +2,6 @@
 import logging as _logging
 
 import pkg_resources
-
 from c7n_broom.config import C7nConfig
 
 from . import actions, config
