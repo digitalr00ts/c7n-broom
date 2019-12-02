@@ -5,10 +5,7 @@ EXPECTED_POLICIES_DATA = {
     "account_included": {"account_included_policy", "default_included_policy"},
     "default_exclude": {"account_included_policy", "default_included_policy"},
     "exclude_all": set(),
-    "account_included_none_exclude": {
-        "account_included_policy",
-        "default_included_policy",
-    },
+    "account_included_none_exclude": {"account_included_policy", "default_included_policy",},
     "account_none_exclude_default": set(),
     "none": {"default_included_policy"},
     "none_policies": {"default_included_policy"},

@@ -1,6 +1,5 @@
 """ Policy package for c7n_broom.config """
 import logging
-
 from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, Iterable, Iterator, Optional, Set, Union
@@ -20,13 +19,9 @@ class PolicyKeys(ExtendedEnum):
     EXCLUDE = "exclude"
 
 
-def _create_dictset(
-    data: Dict[str, Iterable[str]], keys: Iterable[str]
-) -> Dict[str, Set[str]]:
+def _create_dictset(data: Dict[str, Iterable[str]], keys: Iterable[str]) -> Dict[str, Set[str]]:
     """ Returns dict of sets for keys in data """
-    return {
-        key: set(data.get(key) if (data and data.get(key)) else set()) for key in keys
-    }
+    return {key: set(data.get(key) if (data and data.get(key)) else set()) for key in keys}
 
 
 def filter_policies(
@@ -57,15 +52,10 @@ def get_policy_files(
     """ Returns an iterator of paths to policy files. """
     policy_names = filter_policies(account_settings, global_settings)
     path = Path(
-        path
-        if path
-        else global_settings.get("path")
-        if global_settings.get("path")
-        else ""
+        path if path else global_settings.get("path") if global_settings.get("path") else ""
     )
     _LOGGER.debug('Looking for policies in "%s".', path)
 
     return map(
-        lambda policy: policy.with_suffix(f".{file_suffix}"),
-        map(path.joinpath, policy_names),
+        lambda policy: policy.with_suffix(f".{file_suffix}"), map(path.joinpath, policy_names),
     )

@@ -2,15 +2,13 @@
 # pylint: disable=protected-access,missing-function-docstring
 from pathlib import Path
 
+import c7n_broom
 import pytest
-
 from tests.config._data.contants import (
     DICT_OF_KEYS_DATA,
     EXPECTED_POLICIES_DATA,
     MERGE_POLICY_DATA,
 )
-
-import c7n_broom
 
 
 @pytest.fixture(scope="module")
@@ -20,9 +18,7 @@ def configs(request):
     if not vconfig:
         data_path = Path(__file__).parent.joinpath("_data")
         vconfig = c7n_broom.config.get_config("config", path=data_path)
-        c7nconfigs = list(
-            c7n_broom.config.create.c7nconfigs(vconfig, skip_auth_check=True)
-        )
+        c7nconfigs = list(c7n_broom.config.create.c7nconfigs(vconfig, skip_auth_check=True))
     return vconfig, c7nconfigs
 
 
@@ -47,14 +43,9 @@ def test_020_filter_policies(data):
 
 @pytest.mark.parametrize(
     "name,policies",
-    [
-        pytest.param(name, policies, id=name)
-        for name, policies in EXPECTED_POLICIES_DATA.items()
-    ],
+    [pytest.param(name, policies, id=name) for name, policies in EXPECTED_POLICIES_DATA.items()],
 )
-def test_100_c7nconfigs(
-    configs, name, policies
-):  # pylint: disable=redefined-outer-name
+def test_100_c7nconfigs(configs, name, policies):  # pylint: disable=redefined-outer-name
     _, c7nconfigs = configs
     c7n_configs = list(filter(lambda c7nconfig: c7nconfig.profile == name, c7nconfigs))
     assert len(c7n_configs) == len(policies)

@@ -3,13 +3,11 @@ import dataclasses
 import logging
 import os
 import pathlib
-
 from os import PathLike
 from pathlib import Path
 from typing import Iterable, List, Optional, Set, Tuple, Union
 
 import c7n.config
-
 from vyper import Vyper
 
 
@@ -71,7 +69,7 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
     """Configuration for c7n."""
 
     profile: str = os.environ.get("AWS_PROFILE", "")
-    configs: List[str] = dataclasses.field(default_factory=list)
+    configs: Iterable[str] = dataclasses.field(default_factory=list)
     dryrun: bool = True
 
     output_dir: str = ""
