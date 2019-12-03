@@ -139,7 +139,9 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
 
     def get_policy_data(self) -> Iterable[Dict[str, Any]]:
         """ Returns iterable of policies across all policies in configs """
-        return filter(lambda policy_data: policy_data.get("policies"), self.get_config_data())
+        def policy_data(data_):
+            return data_.get("policies")
+        return map(policy_data, filter(policy_data, self.get_config_data()))
 
     def get_policy_resource(self) -> Optional[str]:
         """
