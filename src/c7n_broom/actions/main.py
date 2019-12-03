@@ -7,6 +7,7 @@ from typing import Iterator, Optional
 
 import c7n.commands
 
+from c7n_broom.actions.helper import account_profile_policy_str
 from c7n_broom.config import C7nConfig
 
 
@@ -29,12 +30,7 @@ def query(
 
     """
     MINUTES_IN_DAY = 1440  # pylint: disable=invalid-name
-    profile_policies_str = " - ".join(
-        [
-            c7n_config.profile,
-            ", ".join(map(lambda policy: Path(policy).stem, c7n_config.configs)),
-        ]
-    )
+    profile_policies_str = account_profile_policy_str(c7n_config)
 
     _LOGGING.info("STARTING %s", profile_policies_str)
     print(f"STARTING: {profile_policies_str}")
