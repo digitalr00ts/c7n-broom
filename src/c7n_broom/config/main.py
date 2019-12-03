@@ -5,9 +5,10 @@ import os
 import pathlib
 from os import PathLike
 from pathlib import Path
-from typing import Iterable, List, Optional, Set, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional
 
 import c7n.config
+import yaml
 from vyper import Vyper
 
 
@@ -64,7 +65,7 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
 #     return itertools.chain.from_iterable(
 #         map(lambda account: create_config_per_policy(account), accounts)
 #     )
-@dataclasses.dataclass(eq=False)
+@dataclasses.dataclass()
 class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attributes
     """Configuration for c7n."""
 
@@ -73,9 +74,7 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
     dryrun: bool = True
 
     output_dir: str = ""
-    regions: Iterable[Union[List[str], Set[str], Tuple[str, ...]]] = dataclasses.field(
-        default_factory=set, compare=False
-    )
+    regions: Iterable[str] = dataclasses.field(default_factory=set, compare=False)
     metrics: Optional[str] = "aws://master?region=us-east-1"
     policy_filter: Optional[str] = None
     resource_type: Optional[str] = None
@@ -125,3 +124,33 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
 
         if not self.configs:
             _LOGGER.warning("No configuration files set.")
+        else:
+            if not self.resource_type:
+                self.resource_type = self.get_policy_resource()
+
+    def get_config_data(self) -> Iterable[Dict[str, Any]]:
+        """ Returns iterable of dict for all files in self.config """
+
+        def get_policy_data(policy_file) -> Dict[str, Any]:
+            policy_file = Path(policy_file)
+            return yaml.safe_load(policy_file.read_bytes()) if policy_file.is_file() else dict()
+
+        return map(get_policy_data, self.configs)
+
+    def get_policy_data(self) -> Iterable[Dict[str, Any]]:
+        """ Returns iterable of policies across all policies in configs """
+        return filter(lambda policy_data: policy_data.get("policies"), self.get_config_data())
+
+    def get_policy_resource(self) -> Optional[str]:
+        """
+        Returns resource type if the resources are the same across the policies in the policy file.
+        Otherwise returns None
+        """
+
+        policy_resources = set(
+            map(lambda policy_item: policy_item.get("resource"), self.get_policy_data())
+        )
+        rtn = policy_resources.pop() if len(policy_resources) == 1 else None
+        if not rtn:
+            _LOGGER.warning("No single type of resource type found.")
+        return rtn

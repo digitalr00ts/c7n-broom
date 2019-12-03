@@ -1,37 +1,38 @@
 """ Main of c7n_broom.config.main """
 import itertools
 import logging
-from os import PathLike
-from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 import boto_remora.aws
-import yaml
 from vyper import Vyper
 
 from c7n_broom.config.create.policies import get_policy_files
 from c7n_broom.config.main import C7nConfig
 
 
+# import yaml
+# from os import PathLike
+# from pathlib import Path
+
 _LOGGER = logging.getLogger(__name__)
 
 
-def _get_policy_resource(policy_file: PathLike) -> Optional[str]:
-    """
-    Returns resource type if the resources are the same across the policies in the policy file.
-    Otherwise returns None
-    """
-    policy_file = Path(policy_file)
-    policyfile_data = (
-        yaml.safe_load(policy_file.read_bytes()) if policy_file.is_file() else dict()
-    )
-    policy_resources = set(
-        map(lambda policy_: policy_.get("resource"), policyfile_data.get("policies", tuple()))
-    )
-    rtn = policy_resources.pop() if len(policy_resources) == 1 else None
-    if not rtn:
-        _LOGGER.warning("No single resource type found in %s", policy_file)
-    return rtn
+# def _get_policy_resource(policy_file: PathLike) -> Optional[str]:
+#     """
+#     Returns resource type if the resources are the same across the policies in the policy file.
+#     Otherwise returns None
+#     """
+#     policy_file = Path(policy_file)
+#     policyfile_data = (
+#         yaml.safe_load(policy_file.read_bytes()) if policy_file.is_file() else dict()
+#     )
+#     policy_resources = set(
+#         map(lambda policy_: policy_.get("resource"), policyfile_data.get("policies", tuple()))
+#     )
+#     rtn = policy_resources.pop() if len(policy_resources) == 1 else None
+#     if not rtn:
+#         _LOGGER.warning("No single resource type found in %s", policy_file)
+#     return rtn
 
 
 def account_c7nconfigs(
@@ -54,7 +55,7 @@ def account_c7nconfigs(
             name,
             configs=(policy_name,),
             regions=regions,
-            resource_type=_get_policy_resource(policy_name),
+            # resource_type=_get_policy_resource(policy_name),
             metrics_enabled=False,
         ),
         policies,
