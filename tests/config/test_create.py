@@ -5,11 +5,8 @@ from pathlib import Path
 import pytest
 
 import c7n_broom
-from tests.config._data.contants import (
-    DICT_OF_KEYS_DATA,
-    EXPECTED_POLICIES_DATA,
-    MERGE_POLICY_DATA,
-)
+
+from ._data.contants import DICT_OF_KEYS_DATA, EXPECTED_POLICIES_DATA, MERGE_POLICY_DATA
 
 
 @pytest.fixture(scope="module")
