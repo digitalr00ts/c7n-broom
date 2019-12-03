@@ -152,5 +152,5 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
         )
         rtn = policy_resources.pop() if len(policy_resources) == 1 else None
         if not rtn:
-            _LOGGER.warning("No single type of resource type found.")
+            _LOGGER.warning("%s resource types found.", len(policy_resources))
         return rtn
