@@ -102,6 +102,15 @@ class ResourceKeys(ExtendedEnum):
     )
 
 
+@dataclasses.dataclass(frozen=True, eq=True)
+class FileFormat:
+    """ File extensions and formats for writing reports """
+    html = "html"
+    md = "github"  # pylint: disable=invalid-name
+    txt = "simple"
+    rst = "rst"
+
+
 def _get_resourcekey(resource_type) -> ResourceKey:
     key = getattr(ResourceKeys, resource_type, None)
     if not key:
@@ -136,19 +145,15 @@ def get_table(c7n_config, fmt="simple", data_path="data") -> str:
 
 def write(c7n_config, fmt="md", data_path="data", output_path="reports") -> Optional[PathLike]:
     """ Write report file """
-    fileformats = {
-        "html": "html",
-        "md": "github",
-        "rst": "rst",
-    }
     reportfile = (
         Path(output_path).joinpath(account_profile_policy_str(c7n_config)).with_suffix(f".{fmt}")
     )
-    table = get_table(c7n_config, fmt=fileformats[fmt], data_path=data_path)
+    _LOGGER.debug("Preparing to write %s", reportfile)
+    filefmt = getattr(FileFormat, fmt)
+    table = get_table(c7n_config, fmt=filefmt, data_path=data_path)
     if table:
-        _LOGGER.debug("Writing report %s", reportfile)
-        reportfile.write_text(get_table(c7n_config, fmt=fileformats[fmt], data_path=data_path))
+        reportfile.write_text(get_table(c7n_config, fmt=filefmt, data_path=data_path))
     else:
-        _LOGGER.debug("No data, not writting %s", reportfile)
+        _LOGGER.debug("No data to write %s", reportfile)
         reportfile = None
     return reportfile
