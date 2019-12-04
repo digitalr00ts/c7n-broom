@@ -105,6 +105,7 @@ class ResourceKeys(ExtendedEnum):
 @dataclasses.dataclass(frozen=True, eq=True)
 class FileFormat:
     """ File extensions and formats for writing reports """
+
     html = "html"
     md = "github"  # pylint: disable=invalid-name
     txt = "simple"
