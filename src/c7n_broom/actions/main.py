@@ -17,7 +17,7 @@ _LOGGING = logging.getLogger(__name__)
 def query(
     c7n_config: C7nConfig,
     telemetry_disabled: bool = True,
-    data_dir: PathLike = "results",
+    data_dir: PathLike = "data",
     report_minutes=5,
     regions_override: Optional[Iterator] = None,
 ):
