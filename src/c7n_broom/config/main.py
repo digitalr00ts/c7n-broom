@@ -25,47 +25,6 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
     return config
 
 
-# def create_c7nconfigs_old(accounts):
-#     """ Create c7n config objects per account per policy """
-#
-#     class PolicyKeys(ExtendedEnum):
-#         INCLUDE = "include"
-#         EXCLUDE = "exclude"
-#
-#     def create_policy_dict(data) -> Dict[str, Set[str]]:
-#         """ Creates a dict of policies of POLICY_KEYS """
-#         # Ensures that policies returns as set even when None
-#         rtn_policy_list_as_set = (
-#             lambda data, key: set(data.get(key)) if (data and data.get(key)) else set()
-#         )
-#         return {key: rtn_policy_list_as_set(data, key) for key in PolicyKeys.values()}
-#
-#     def create_config_per_policy(account):
-#         _LOGGER.debug("Creating c7n config objects for account [%s]", account["name"])
-#
-#         def policies() -> Set[str]:
-#             """ Combine the includes and excludes policies from defaults and the account """
-#             account_policies = create_policy_dict(account.get("policies"))
-#             policies_sets = {
-#                 policy_key: account_policies[policy_key].union(
-#                     default_policies[policy_key]
-#                 )
-#                 for policy_key in PolicyKeys.values()
-#             }
-#
-#             return policies_sets[PolicyKeys.INCLUDE.value].difference(
-#                 policies_sets[PolicyKeys.EXCLUDE.value]
-#             )
-#
-#         return map(
-#             lambda policy: C7nConfig(account["name"], configs=[policy]), policies()
-#         )
-#
-#     default_policies = create_policy_dict(config.get("defaults.policies"))
-#
-#     return itertools.chain.from_iterable(
-#         map(lambda account: create_config_per_policy(account), accounts)
-#     )
 @dataclasses.dataclass()
 class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attributes
     """Configuration for c7n."""
