@@ -42,6 +42,7 @@ def account_c7nconfigs(
     skip_regions: bool = False,
 ):
     """ Create c7n config per policy for account. """
+    _LOGGER.info("Creating c7n configs for %s", name)
     policies = get_policy_files(
         account_settings.get("policies") if account_settings else dict(),
         global_settings.get("policies") if global_settings else dict(),
