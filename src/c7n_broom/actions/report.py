@@ -119,32 +119,38 @@ def _get_resourcekey(resource_type) -> ResourceKey:
     return key.value
 
 
-def get_data_map(c7n_config, data_path="data") -> Dict[str, Any]:
+def get_data_map(c7n_config, data_path="data") -> Optional[Dict[str, Any]]:
     """ Queries data for resource key """
     resource_key = _get_resourcekey(c7n_config.resource_type.replace("-", "_"))
     datafile = (
         Path(data_path).joinpath(account_profile_policy_str(c7n_config)).with_suffix(".json")
     )
     expression = jmespath.compile(f"[].{{{resource_key.data}}}")
+    rawdata = None
     if datafile.is_file():
         rawdata = expression.search(json.loads(datafile.read_bytes()))
+        for item in rawdata:
+            item["tags"] = (
+                dict((tag["Key"], tag["Value"]) for tag in item["tags"])
+                if item.get("tags")
+                else None
+            )
     else:
         _LOGGER.error("File not found %s", datafile)
-        rawdata = dict()
-    for item in rawdata:
-        if item.get("tags"):
-            item["tags"] = dict((tag["Key"], tag["Value"]) for tag in item["tags"])
+
     return rawdata
 
 
-def get_table(c7n_config, fmt="simple", data_path="data") -> str:
+def get_table(c7n_config, fmt: str = "simple", data_path: str = "data") -> str:
     """ Generate table str """
     return tabulate(
         get_data_map(c7n_config, data_path), headers="keys", showindex=True, tablefmt=fmt
     )
 
 
-def write(c7n_config, fmt="md", data_path="data", output_path="reports") -> Optional[PathLike]:
+def write(
+    c7n_config, fmt: str = "md", data_path: str = "data", output_path: PathLike = "reports"
+) -> Optional[PathLike]:
     """ Write report file """
     reportfile = (
         Path(output_path).joinpath(account_profile_policy_str(c7n_config)).with_suffix(f".{fmt}")
