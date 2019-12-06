@@ -31,33 +31,10 @@ def account_c7nconfigs(
     # TODO: remove hardcoded disabling metrics and move to broom config
     return map(
         lambda policy_name: C7nConfig(
-            name,
-            configs=(policy_name,),
-            regions=regions,
-            # resource_type=_get_policy_resource(policy_name),
-            metrics_enabled=False,
+            name, configs=(policy_name,), regions=regions, metrics_enabled=False,
         ),
         policies,
     )
-
-
-def _authed_accounts_data(accounts, skip_unauthed: bool):
-    def is_authed(profile, region="us-east-1") -> bool:
-        return (
-            boto_remora.aws.Sts(profile, region_name=region).is_session_region_accessible
-            if boto_remora.aws.AwsBase().is_profile_available(profile)
-            else False
-        )
-
-    accounts_authed_data = dict(filter(lambda account: is_authed(account[0]), accounts.items()))
-    accounts_not_authed = set(accounts.keys()).difference(accounts_authed_data.keys())
-    if accounts_not_authed:
-        msg = f"Not all accounts can access the AWS API {accounts_not_authed}."
-        if skip_unauthed:
-            _LOGGER.warning(msg)
-        else:
-            raise RuntimeError(msg)
-    return accounts_authed_data
 
 
 def c7nconfigs(
@@ -68,6 +45,7 @@ def c7nconfigs(
     """ Create c7n configs for every policy and account """
     global_settings = config.get("global")
     accounts = config.get("accounts")
+
     if (
         accounts is not None
         and len(accounts) == 1
@@ -77,19 +55,28 @@ def c7nconfigs(
         import botocore  # pylint: disable=import-outside-toplevel
 
         accounts = {profile: None for profile in botocore.session.Session().available_profiles}
-    if not skip_auth_check:
-        accounts = _authed_accounts_data(accounts, skip_unauthed)
+
+    if not skip_auth_check and accounts:
+        authed_profiles = boto_remora.aws.helper.get_authed_profiles(accounts.keys())
+        unauthed_profiles = set(accounts).difference(authed_profiles)
+        msg = f"Not all accounts can access the AWS API {unauthed_profiles}."
+        if skip_unauthed:
+            if unauthed_profiles:
+                _LOGGER.info(msg)
+            accounts = dict(
+                filter(lambda account, _: account in authed_profiles, accounts.items())
+            )
+        elif unauthed_profiles:
+            raise RuntimeError(msg)
 
     if not accounts:
-        _LOGGER.critical("No accounts in config.")
+        _LOGGER.critical("No accounts to create c7n configs.")
+
     return itertools.chain.from_iterable(
         map(
-            lambda account_name: account_c7nconfigs(
-                account_name,
-                accounts.get(account_name),
-                global_settings,
-                skip_regions=skip_auth_check,
+            lambda kv_: account_c7nconfigs(
+                kv_[0], kv_[1], global_settings, skip_regions=skip_auth_check,
             ),
-            accounts.keys(),
+            accounts.items(),
         )
     )
