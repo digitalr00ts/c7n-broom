@@ -63,9 +63,7 @@ def c7nconfigs(
         if skip_unauthed:
             if unauthed_profiles:
                 _LOGGER.info(msg)
-            accounts = dict(
-                filter(lambda account_: account_ in authed_profiles, accounts.keys())
-            )
+            accounts = dict(filter(lambda account_: account_ in authed_profiles, accounts.keys()))
         elif unauthed_profiles:
             raise RuntimeError(msg)
 
