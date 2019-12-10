@@ -18,6 +18,7 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_config(filename: str = "config", path: PathLike = Path(".")):
     """ Read in config file """
+    # TODO: Figure out why defaults does not work.
     default_path = "global.path"
     defaults = {
         "policies": {"path": path},

@@ -24,7 +24,6 @@ def account_c7nconfigs(
     policies = get_policy_files(
         account_settings.get("policies") if account_settings else dict(),
         global_settings.get("policies") if global_settings else dict(),
-        # path=global_settings.get("path"),
     )
     # TODO: remove skip regions in favor of setting regions in broom config
     regions = boto_remora.aws.Ec2(name).available_regions if not skip_regions else list()
