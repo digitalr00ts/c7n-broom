@@ -46,14 +46,15 @@ def filter_policies(
 def get_policy_files(
     account_settings: Union[Vyper, Dict[str, Any]],
     global_settings: Optional[Union[Vyper, Dict[str, Any]]] = None,
-    path: Optional[Union[PathLike, str]] = None,
+    path: Union[PathLike, str] = "",
     file_suffix="yml",
 ) -> Iterator[PathLike]:
     """ Returns an iterator of paths to policy files. """
     policy_names = filter_policies(account_settings, global_settings)
-    path = Path(
-        path if path else global_settings.get("path") if global_settings.get("path") else ""
-    )
+    if not path and global_settings.get("path"):
+        _LOGGER.info("Setting policy path to %s", path)
+        path = global_settings.get("path")
+    path = Path(path)
     _LOGGER.debug('Looking for policies in "%s".', path)
 
     return map(
