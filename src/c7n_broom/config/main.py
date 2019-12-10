@@ -25,6 +25,7 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
     config.add_config_path(Path(path))
     config.read_in_config()
     if not config.is_set(default_path):
+        _LOGGER.info("Setting default path to %s", path)
         config.set(default_path, path)
     return config
 
