@@ -18,8 +18,9 @@ _LOGGER = logging.getLogger(__name__)
 
 def get_config(filename: str = "config", path: PathLike = Path(".")):
     """ Read in config file """
+    defaults = {"globals": {"policies": {"path": path}}}
     config = Vyper(filename)
-    config.set_default("defaults", dict())
+    config.set_default("defaults", defaults)
     config.add_config_path(Path(path))
     config.read_in_config()
     return config
