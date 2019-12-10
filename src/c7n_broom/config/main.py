@@ -24,7 +24,7 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
         "path": path,
     }
     config = Vyper(filename)
-    config.set_default("globals", defaults)
+    config.set_default("global", defaults)
     config.add_config_path(Path(path))
     config.read_in_config()
     if not config.is_set(default_path):
