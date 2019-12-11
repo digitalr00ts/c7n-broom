@@ -52,3 +52,5 @@ def query(
 
     print(f"COMPLETED: {profile_policies_str}")
     logging.info("COMPLETED %s", profile_policies_str)
+    logging.debug("Data file writen %s", datafile)
+    return datafile
