@@ -20,6 +20,7 @@ def query(
     data_dir: PathLike = "data",
     report_minutes=5,
     regions_override: Optional[Iterator] = None,
+    dryrun: bool = False,
 ):
     """
 
@@ -35,12 +36,14 @@ def query(
     _LOGGING.info("STARTING %s", profile_policies_str)
     print(f"STARTING: {profile_policies_str}")
 
-    if regions_override is not None:
-        c7n_config.regions = regions_override
+    c7n_config.dryrun = dryrun
     c7n_config.no_default_fields = True
+    if regions_override:
+        c7n_config.regions = regions_override
     if telemetry_disabled:
         c7n_config.metrics = None
-    c7n_config.dry = True
+        c7n_config.metrics_enabled = False
+
     c7n.commands.run(c7n_config)  # pylint: disable=no-value-for-parameter
 
     report_settings = dataclasses.replace(c7n_config)
