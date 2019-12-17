@@ -85,7 +85,7 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
         c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)
         self.regions = set(self.regions)
 
-        if not self.cache:
+        if self.cache is None:
             self.cache = str(c7n_home.joinpath("cloud-custodian.cache"))
 
         if not self.output_dir:
