@@ -30,7 +30,6 @@ def query(
     regions_override: For debugging
 
     """
-    c7n_config = dataclasses.replace(c7n_config)
     MINUTES_IN_DAY = 1440  # pylint: disable=invalid-name
     profile_policies_str = account_profile_policy_str(c7n_config)
 
@@ -45,7 +44,7 @@ def query(
         c7n_config.metrics = None
         c7n_config.metrics_enabled = False
 
-    c7n.commands.run(c7n_config)  # pylint: disable=no-value-for-parameter
+    c7n.commands.run(dataclasses.replace(c7n_config))  # pylint: disable=no-value-for-parameter
 
     report_settings = dataclasses.replace(c7n_config)
     report_settings.days = report_minutes / MINUTES_IN_DAY
