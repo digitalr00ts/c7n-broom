@@ -1,6 +1,7 @@
 """ Main of c7n_broom.config.main """
 import itertools
 import logging
+from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
 import boto_remora.aws
@@ -30,10 +31,13 @@ def account_c7nconfigs(
     # TODO: remove skip regions in favor of setting regions in broom config
     regions = boto_remora.aws.Ec2(name).available_regions if not skip_regions else list()
 
+    c7n_home = global_settings.get("c7n_home")
     c7nconfig_kwargs = {
         "profile": name,
         "regions": regions,
         "metrics_enabled": False,
+        "output_dir": Path(c7n_home).joinpath(name) if c7n_home else "",
+        "cache": Path(c7n_home).joinpath(name) if c7n_home else None,
     }
     c7nconfig_kwargs.update(global_settings.get("c7n", dict()))
     c7nconfig_kwargs.update(account_settings.get("c7n", dict()))

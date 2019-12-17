@@ -85,9 +85,7 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
                 _LOGGER.debug("Adding missing attribute %s:%s.", k, v)
                 setattr(self, k, v)
 
-        if not self.c7n_home:
-            self.c7n_home = pathlib.Path.home().joinpath(".cache/c7n")
-        c7n_home = self.c7n_home.joinpath(self.profile)
+        c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)
 
         self.regions = set(self.regions)
 
