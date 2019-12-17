@@ -53,6 +53,7 @@ def query(
         report_settings.raw = data_fd
         c7n.commands.report(report_settings)  # pylint: disable=no-value-for-parameter
 
+    profile_policies_str = account_profile_policy_str(c7n_config)
     print(f"COMPLETED: {profile_policies_str}")
     logging.info("COMPLETED %s", profile_policies_str)
     logging.debug("Data file writen %s", datafile)
