@@ -70,7 +70,7 @@ def c7nconfigs(
         aws_stss = tuple(map(Sts, available_profiles))
         accountids = {sts_.profile_name: sts_.account for sts_ in aws_stss}
         authed_profiles = tuple(filter(lambda aid_: aid_[1], accountids.items()))
-        unauthed_profiles = set(available_profiles).difference(authed_profiles)
+        unauthed_profiles = set(accounts).difference(authed_profiles)
         msg = f"Not all accounts can access the AWS API {unauthed_profiles}."
         if skip_unauthed:
             if unauthed_profiles:
