@@ -96,10 +96,12 @@ def c7nconfigs(
     if not accounts:
         _LOGGER.critical("No accounts to create c7n configs.")
 
-    for profile_ in accounts:
-        data_ = accounts[profile_]
-        data_["c7n"] = data_.get("c7n", dict())
-        data_["c7n"]["account_id"] = data_["c7n"].get("account_id", accountids.get(profile_))
+    for profile_ in accounts.keys():
+        if accounts[profile_] is None:
+            accounts[profile_] = dict()
+        data_ = accounts[profile_].get("c7n", dict())
+        accounts[profile_]["c7n"] = data_
+        accounts[profile_]["c7n"]["account_id"] = data_.get("account_id", accountids.get(profile_))
 
     return itertools.chain.from_iterable(
         map(
