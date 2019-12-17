@@ -36,8 +36,8 @@ def account_c7nconfigs(
         "profile": name,
         "regions": regions,
         "metrics_enabled": False,
-        "output_dir": Path(c7n_home).joinpath(name) if c7n_home else "",
-        "cache": Path(c7n_home).joinpath(name) if c7n_home else None,
+        "output_dir": str(Path(c7n_home).joinpath(name)) if c7n_home else "",
+        "cache": str(Path(c7n_home).joinpath(name)) if c7n_home else None,
     }
     c7nconfig_kwargs.update(global_settings.get("c7n", dict()))
     c7nconfig_kwargs.update(account_settings.get("c7n", dict()))
