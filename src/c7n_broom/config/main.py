@@ -86,14 +86,16 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
                 setattr(self, k, v)
 
         if not self.c7n_home:
-            self.c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)
+            self.c7n_home = pathlib.Path.home().joinpath(".cache/c7n")
+        c7n_home = self.c7n_home.joinpath(self.profile)
+
         self.regions = set(self.regions)
 
         if self.cache is None:
-            self.cache = str(self.c7n_home.joinpath("cloud-custodian.cache"))
+            self.cache = str(c7n_home.joinpath("cloud-custodian.cache"))
 
         if self.output_dir == "":
-            self.output_dir = str(self.c7n_home.joinpath("output"))
+            self.output_dir = str(c7n_home)
 
         if not self.configs:
             _LOGGER.warning("No configuration files set.")
