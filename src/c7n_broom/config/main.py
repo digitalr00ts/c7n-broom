@@ -73,6 +73,9 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
     # IDK, but c7n will throw errors w/o it.
     vars: Optional[List] = None
 
+    # c7n_broom
+    c7n_home: Optional[PathLike] = None
+
     def __post_init__(self):
         if not self.profile:
             raise TypeError("Profile must be set.")
@@ -82,14 +85,15 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
                 _LOGGER.debug("Adding missing attribute %s:%s.", k, v)
                 setattr(self, k, v)
 
-        c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)
+        if not self.c7n_home:
+            self.c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)
         self.regions = set(self.regions)
 
         if self.cache is None:
-            self.cache = str(c7n_home.joinpath("cloud-custodian.cache"))
+            self.cache = str(self.c7n_home.joinpath("cloud-custodian.cache"))
 
         if self.output_dir == "":
-            self.output_dir = str(c7n_home.joinpath("output"))
+            self.output_dir = str(self.c7n_home.joinpath("output"))
 
         if not self.configs:
             _LOGGER.warning("No configuration files set.")
