@@ -101,7 +101,9 @@ def c7nconfigs(
             accounts[profile_] = dict()
         data_ = accounts[profile_].get("c7n", dict())
         accounts[profile_]["c7n"] = data_
-        accounts[profile_]["c7n"]["account_id"] = data_.get("account_id", accountids.get(profile_))
+        accounts[profile_]["c7n"]["account_id"] = data_.get(
+            "account_id", accountids.get(profile_)
+        )
 
     return itertools.chain.from_iterable(
         map(
