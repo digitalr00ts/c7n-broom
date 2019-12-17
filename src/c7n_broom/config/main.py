@@ -73,9 +73,6 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
     # IDK, but c7n will throw errors w/o it.
     vars: Optional[List] = None
 
-    # c7n_broom
-    c7n_home: Optional[PathLike] = None
-
     def __post_init__(self):
         if not self.profile:
             raise TypeError("Profile must be set.")
