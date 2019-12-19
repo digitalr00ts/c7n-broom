@@ -49,16 +49,23 @@ def account_c7nconfigs(
     )
 
 
-def c7nconfigs(
+def c7nconfigs(  # pylint: disable=too-many-locals
     config: Union[Vyper, Dict[str, Any]],
-    skip_unauthed: bool = False,
-    skip_auth_check: bool = False,
+    skip_unauthed: Optional[bool] = None,
+    skip_auth_check: Optional[bool] = None,
 ):
     """ Create c7n configs for every policy and account """
     global_settings = config.get("global")
     accounts = config.get("accounts")
+    broom_settings = config.get("broom") if config.get("broom") else dict()
     available_profiles = botocore.session.Session().available_profiles
     accountids = {profile_: None for profile_ in available_profiles}
+
+    if skip_unauthed is None:
+        skip_unauthed = broom_settings.get("skip_unauthed")
+
+    if skip_auth_check is None:
+        skip_auth_check = broom_settings.get("skip_auth_check")
 
     if (
         accounts is not None
