@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from functools import partial
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, Generator, Iterator, Optional, Sequence, Union
+from typing import Any, Dict, Iterator, Optional, Sequence, Union
 
 from vyper import Vyper
 
@@ -25,7 +25,7 @@ class Sweeper:
     config_file: Union[PathLike, str] = field(default="config", repr=False)
     data_dir: PathLike = Path("data").joinpath("query")
     report_dir: PathLike = Path("data").joinpath("report")
-    jobs: Union[Sequence[C7nConfig], Generator[C7nConfig]] = field(init=False, repr=False)
+    jobs: Sequence[C7nConfig] = field(init=False, repr=False)
 
     def __post_init__(self):
         if not self.settings:
