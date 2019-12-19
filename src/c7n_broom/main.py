@@ -73,7 +73,7 @@ class Sweeper:
 
     def query(self, telemetry=False, batch="profile"):
         """ Run without actions. Dryrun true. """
-        jobs = getattr(self, "jobs_by_".join((batch,)))
+        jobs = getattr(self, "jobs_by_" + batch)
         action = partial(
             c7n_broom.actions.query, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
@@ -81,7 +81,7 @@ class Sweeper:
 
     def clean(self, telemetry=False, batch="profile"):
         """ Run actions. Dryrun false. """
-        jobs = getattr(self, "jobs_by_".join((batch,)))
+        jobs = getattr(self, "jobs_by_" + batch)
         action = partial(
             c7n_broom.actions.clean, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
