@@ -14,14 +14,14 @@ from c7n_broom.config import C7nConfig
 _LOGGING = logging.getLogger(__name__)
 
 
-def query(
+def run(
     c7n_config: C7nConfig,
-    telemetry_disabled: bool = True,
     data_dir: PathLike = "data",
+    dryrun: bool = True,
+    telemetry_disabled: bool = True,
     report_minutes=5,
     regions_override: Optional[Iterator] = None,
-    dryrun: bool = False,
-):
+):  # pylint: disable = too-many-arguments
     """
 
     c7n_config:
@@ -57,3 +57,25 @@ def query(
     logging.info("COMPLETED %s", profile_policies_str)
     logging.debug("Data file writen %s", datafile)
     return datafile
+
+
+def query(
+    c7n_config: C7nConfig,
+    data_dir: PathLike = Path("data").joinpath("query"),
+    telemetry_disabled: bool = True,
+):
+    """ Run without actions. Dryrun true. """
+    run(
+        c7n_config, data_dir=data_dir, telemetry_disabled=telemetry_disabled, dryrun=True,
+    )
+
+
+def clean(
+    c7n_config: C7nConfig,
+    data_dir: PathLike = Path("data").joinpath("query"),
+    telemetry_disabled: bool = True,
+):
+    """ Run actions. Dryrun false. """
+    run(
+        c7n_config, data_dir=data_dir, telemetry_disabled=telemetry_disabled, dryrun=False,
+    )
