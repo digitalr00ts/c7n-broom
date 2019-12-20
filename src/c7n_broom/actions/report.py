@@ -152,6 +152,7 @@ def write(
     c7n_config, fmt: str = "md", data_path: str = "data", output_path: PathLike = "reports"
 ) -> Optional[PathLike]:
     """ Write report file """
+    Path(output_path).mkdir(parents=True, exist_ok=True)
     reportfile = (
         Path(output_path).joinpath(account_profile_policy_str(c7n_config)).with_suffix(f".{fmt}")
     )

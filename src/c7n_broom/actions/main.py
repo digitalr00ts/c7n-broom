@@ -33,6 +33,8 @@ def run(
     MINUTES_IN_DAY = 1440  # pylint: disable=invalid-name
     profile_policies_str = account_profile_policy_str(c7n_config)
 
+    Path(data_dir).mkdir(parents=True, exist_ok=True)
+
     _LOGGING.info("STARTING %s", profile_policies_str)
     print(f"STARTING: {profile_policies_str}")
 
