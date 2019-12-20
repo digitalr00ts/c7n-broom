@@ -106,7 +106,7 @@ class Sweeper:
             output_path=self.report_dir,
         )
         filelist = tuple(map(str, filter(None, map(writer, self.jobs))))
-        _LOGGER.debug("%s report file written", len(filelist))
+        _LOGGER.info("%s report file written", len(filelist))
         return filelist
 
     def gen_html(self, html_dir: PathLike = "public"):
