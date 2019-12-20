@@ -25,16 +25,24 @@ class Sweeper:
     config_file: Union[PathLike, str] = field(default="config", repr=False)
     data_dir: PathLike = Path("data").joinpath("query")
     report_dir: PathLike = Path("data").joinpath("report")
+    skip_unauthed: bool = False
+    auth_check: bool = True
     jobs: Sequence[C7nConfig] = field(init=False, repr=False)
 
     def __post_init__(self):
         if not self.settings:
             self.settings = c7n_broom.config.get_config(filename=str(self.config_file))
         broom_settings = self.settings.get("broom") if self.settings.get("broom") else dict()
-        for attrib in ("data_dir", "report_dir"):
+        for attrib in ("data_dir", "report_dir", "auth_check", "skip_unauthed"):
             if broom_settings.get(attrib):
                 setattr(self, attrib, broom_settings.get(attrib))
-        self.jobs = tuple(c7n_broom.config.create.c7nconfigs(self.settings))
+        self.jobs = tuple(
+            c7n_broom.config.create.c7nconfigs(
+                self.settings,
+                skip_unauthed=self.skip_unauthed,
+                skip_auth_check=not self.auth_check,
+            )
+        )
 
     def _get_by_attrib(self, attribute: str, attribute_val: str):
         return filter(lambda job_: getattr(job_, attribute, False) == attribute_val, self.jobs)
