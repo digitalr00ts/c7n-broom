@@ -70,7 +70,7 @@ def query(
     )
 
 
-def clean(
+def execute(
     c7n_config: C7nConfig,
     data_dir: PathLike = Path("data").joinpath("query"),
     telemetry_disabled: bool = True,

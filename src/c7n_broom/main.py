@@ -87,11 +87,11 @@ class Sweeper:
         )
         return self._exec(action, jobs)
 
-    def clean(self, telemetry=False, batch="profile"):
+    def execute(self, telemetry=False, batch="profile"):
         """ Run actions. Dryrun false. """
         jobs = getattr(self, "jobs_by_" + batch)
         action = partial(
-            c7n_broom.actions.clean, data_dir=self.data_dir, telemetry_disabled=not telemetry,
+            c7n_broom.actions.execute, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
         return self._exec(action, jobs)
 
