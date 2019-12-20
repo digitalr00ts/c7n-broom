@@ -95,8 +95,10 @@ class Sweeper:
         )
         return self._exec(action, jobs)
 
-    def gen_reports(self, fmt="md"):
+    def gen_reports(self, fmt="md", report_dir=None):
         """ Generate reports. Markdown by default. """
+        if not report_dir:
+            report_dir = self.report_dir
         writer = partial(
             c7n_broom.actions.write_report,
             fmt=fmt,
@@ -109,8 +111,4 @@ class Sweeper:
 
     def gen_html(self, html_dir: PathLike = "public"):
         """ Generate HTML report """
-        report_dir_tmp = self.report_dir
-        self.report_dir = html_dir
-        filelist = self.gen_reports("html")
-        self.report_dir = report_dir_tmp
-        return filelist
+        return self.gen_reports("html", report_dir=html_dir)
