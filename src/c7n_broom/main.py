@@ -24,7 +24,7 @@ class Sweeper:
     settings: Optional[Union[Vyper, Dict[str, Any]]] = None
     config_file: Union[PathLike, str] = field(default="config", repr=False)
     data_dir: PathLike = Path("data").joinpath("query")
-    report_dir: PathLike = Path("data").joinpath("report")
+    report_dir: PathLike = Path("data").joinpath("reports")
     skip_unauthed: bool = False
     auth_check: bool = True
     jobs: Sequence[C7nConfig] = field(init=False, repr=False)
