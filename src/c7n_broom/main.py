@@ -103,7 +103,7 @@ class Sweeper:
             c7n_broom.actions.write_report,
             fmt=fmt,
             data_path=self.data_dir,
-            output_path=self.report_dir,
+            output_path=report_dir,
         )
         filelist = tuple(map(str, filter(None, map(writer, self.jobs))))
         _LOGGER.info("%s report file written", len(filelist))
