@@ -7,7 +7,7 @@ from collections import UserDict
 from dataclasses import asdict
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Optional, Sequence, Tuple
 
 import jmespath
 from tabulate import tabulate
@@ -31,11 +31,11 @@ class ResourceKeyDict(UserDict):  # pylint: disable=too-many-ancestors
 class ResourceKey:
     """ Data structure for descriptions of resources used in report generation """
 
-    name: str
     id: str  # pylint: disable=invalid-name
-    size: str
-    # date: str
+    name: str = "SKIP"
+    size: str = "SKIP"
     region: str = "region"
+    date: str = "SKIP"
     tags: str = "Tags"
     extras: Tuple[Tuple[str, str], ...] = dataclasses.field(default_factory=tuple)
 
@@ -53,52 +53,38 @@ class ResourceKeys(ExtendedEnum):
     ami = ResourceKey(
         id="ImageId",
         name="Name",
-        size="X",
-        # date="CreationDate",
+        date="CreationDate",
         # extras=(("BlockDeviceMappings", "BlockDeviceMappings"),)
     )
-    ebs = ResourceKey(
-        id="VolumeId",
-        name="X",
-        size="Size",
-        # date="CreateTime",
-    )
+    ebs = ResourceKey(id="VolumeId", size="Size", date="CreateTime",)
     ebs_snapshot = ResourceKey(
-        id="SnapshotId",
-        name="VolumeId",
-        size="VolumeSize",
-        # date="StartTime",
+        id="SnapshotId", name="VolumeId", size="VolumeSize", date="StartTime",
     )
-    ec2 = ResourceKey(
-        id="InstanceId",
-        name="ImageId",
-        size="InstanceType",
-        # date="LaunchTime",
-    )
+    ec2 = ResourceKey(id="InstanceId", name="ImageId", size="InstanceType", date="LaunchTime",)
     rds = ResourceKey(
         id="DBInstanceArn",
         name="DBInstanceIdentifier",
         size="AllocatedStorage",
-        # date="InstanceCreateTime",
+        date="InstanceCreateTime",
     )
     rds_cluster_snapshot = ResourceKey(
         id="DBClusterSnapshotArn",
         name="DBClusterSnapshotIdentifier",
         size="AllocatedStorage",
-        # date="SnapshotCreateTime",
+        date="SnapshotCreateTime",
     )
     rds_snapshot = ResourceKey(
         id="DBSnapshotArn",
         name="DBSnapshotIdentifier",
         size="AllocatedStorage",
-        # date="SnapshotCreateTime",
+        date="SnapshotCreateTime",
     )
     test = ResourceKey(
         id="key",
         name="label",
         size="",
         # date="datetime",
-        extras=(("Key", "keyname"),),
+        # extras=(("Key", "keyname"),),
     )
 
 
@@ -119,24 +105,23 @@ def _get_resourcekey(resource_type) -> ResourceKey:
     return key.value
 
 
-def get_data_map(c7n_config, data_path="data") -> Optional[Dict[str, Any]]:
+def get_data_map(c7n_config, data_path="data") -> Sequence[Dict[str, Any]]:
     """ Queries data for resource key """
     resource_key = _get_resourcekey(c7n_config.resource_type.replace("-", "_"))
     datafile = (
         Path(data_path).joinpath(account_profile_policy_str(c7n_config)).with_suffix(".json")
     )
     expression = jmespath.compile(f"[].{{{resource_key.data}}}")
-    rawdata = None
-    if datafile.is_file():
-        rawdata = expression.search(json.loads(datafile.read_bytes()))
-        for item in rawdata:
-            item["tags"] = (
-                dict((tag["Key"], tag["Value"]) for tag in item["tags"])
-                if item.get("tags")
-                else None
-            )
-    else:
+    if not datafile.is_file():
         _LOGGER.error("File not found %s", datafile)
+        return list()
+
+    rawdata = expression.search(json.loads(datafile.read_bytes()))
+    for item in rawdata:
+        item["tags"] = (
+            dict((tag["Key"], tag["Value"]) for tag in item["tags"]) if item.get("tags") else None
+        )
+    sorted(rawdata, key=lambda item_: item_["date"])
 
     return rawdata
 
