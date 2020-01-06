@@ -1,0 +1,45 @@
+""" Process pricing information """
+import itertools
+from typing import Any, Dict, Sequence
+
+
+def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bool = False):
+    """ Group query data by attribute """
+
+    def sort_key(item_):
+        return item_[attribute]
+
+    if not region_first:
+        return itertools.groupby(sorted(datamap, key=sort_key), key=sort_key)
+
+    return map(
+        lambda item_: (item_[0], group_by(item_[1], attribute)), group_by(datamap, "region")
+    )
+
+
+def count_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bool = False):
+    """ Counts items by attribute """
+    if not region_first:
+        return dict(
+            map(
+                lambda item_: (item_[0], sum(1 for _ in item_[1])),
+                group_by(datamap, attribute=attribute, region_first=False),
+            )
+        )
+
+    return dict(
+        map(
+            lambda data_: (data_[0], count_by(data_[1], attribute, region_first=False)),
+            group_by(datamap, attribute=attribute, region_first=True),
+        )
+    )
+
+
+def group_by_size(datamap, region_first: bool = True):
+    """ Group query results by size """
+    return group_by(datamap, attribute="size", region_first=region_first)
+
+
+def count_by_size(datamap, region_first: bool = True):
+    """ Counts items by size """
+    return count_by(datamap, attribute="size", region_first=region_first)

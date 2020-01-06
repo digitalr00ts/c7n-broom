@@ -6,7 +6,7 @@ import pkg_resources
 from c7n_broom.config import C7nConfig
 from c7n_broom.main import Sweeper
 
-from . import actions, config
+from . import actions, config, data
 
 
 try:
