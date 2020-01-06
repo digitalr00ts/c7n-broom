@@ -96,7 +96,32 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
             _LOGGER.warning("No configuration files set.")
         else:
             if not self.resource_type:
-                self.resource_type = self.get_policy_resource()
+                self.resource_type = self._get_policy_resource
+
+    @property
+    def _get_policy_resource(self) -> Optional[str]:
+        """
+        Returns resource type if the resources are the same across the policies in the policy file.
+        Otherwise returns None
+        """
+
+        policy_resources = set(
+            map(lambda policy_item: policy_item.get("resource"), self.get_policy_data())
+        )
+        rtn = policy_resources.pop() if len(policy_resources) == 1 else None
+        if not rtn:
+            _LOGGER.warning("%s resource types found.", len(policy_resources))
+        return rtn
+
+    @property
+    def get_str(self):
+        """
+        Returns a string for the c7n_config.
+        Used for creating files names.
+        """
+        return ":".join(
+            [self.profile, ", ".join(map(lambda policy: Path(policy).stem, self.configs)),]
+        )
 
     def get_config_data(self) -> Iterable[Dict[str, Any]]:
         """ Returns iterable of dict for all files in self.config """
@@ -116,17 +141,3 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
         return itertools.chain.from_iterable(
             map(policy_data, filter(policy_data, self.get_config_data()))
         )
-
-    def get_policy_resource(self) -> Optional[str]:
-        """
-        Returns resource type if the resources are the same across the policies in the policy file.
-        Otherwise returns None
-        """
-
-        policy_resources = set(
-            map(lambda policy_item: policy_item.get("resource"), self.get_policy_data())
-        )
-        rtn = policy_resources.pop() if len(policy_resources) == 1 else None
-        if not rtn:
-            _LOGGER.warning("%s resource types found.", len(policy_resources))
-        return rtn
