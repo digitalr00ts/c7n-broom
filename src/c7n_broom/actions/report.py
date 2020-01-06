@@ -119,7 +119,7 @@ def get_data_map(c7n_config, data_path="data") -> Sequence[Dict[str, Any]]:
     rawdata = expression.search(json.loads(datafile.read_bytes()))
     for item in rawdata:
         item["tags"] = (
-            dict((tag["Key"], tag["Value"]) for tag in item["tags"]) if item.get("tags") else None
+            dict((tag["Key"], tag["Value"]) for tag in item["tags"]) if item.get("tags") else dict()
         )
     sorted(rawdata, key=lambda item_: item_["date"])
 
