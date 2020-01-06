@@ -1,9 +1,10 @@
 """ main package for c7n_broom.actions """
 import dataclasses
+import json
 import logging
 from os import PathLike
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Any, Dict, Iterator, Optional
 
 import c7n.commands
 
@@ -81,3 +82,14 @@ def execute(
     run(
         c7n_config, data_dir=data_dir, telemetry_disabled=telemetry_disabled, dryrun=False,
     )
+
+
+def read_data(
+    c7n_config: C7nConfig, data_dir: PathLike = Path("data").joinpath("query"),
+) -> Optional[Dict[str, Any]]:
+    """
+        Return data from query data.
+        Return None if data dne
+        """
+    datafile = Path(data_dir).joinpath(c7n_config.get_str).with_suffix(".json")
+    return json.loads(datafile.read_bytes())
