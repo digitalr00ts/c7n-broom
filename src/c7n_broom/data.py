@@ -14,7 +14,7 @@ def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bo
         return item_[attribute]
 
     if not region_first:
-        return (
+        return tuple(
             (key_, tuple(val_))
             for key_, val_ in itertools.groupby(sorted(datamap, key=sort_key), key=sort_key)
         )
@@ -56,4 +56,4 @@ def count_by_region(datamap: Sequence[Dict[str, Any]], and_by_size: bool = False
     kwargs = {"attribute": "region", "region_first": False}
     if and_by_size and datamap and any(map(lambda item_: item_.get("size", None), datamap)):
         kwargs = {"attribute": "size", "region_first": True}
-    return group_by(datamap, **kwargs)
+    return count_by(datamap, **kwargs)
