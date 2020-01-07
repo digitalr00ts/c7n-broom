@@ -14,7 +14,7 @@ def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bo
         return item_[attribute]
 
     if not region_first:
-        return itertools.groupby(sorted(datamap, key=sort_key), key=sort_key)
+        return ((key_, tuple(val_)) for key_, val_ in itertools.groupby(sorted(datamap, key=sort_key), key=sort_key))
 
     return map(
         lambda item_: (item_[0], group_by(item_[1], attribute)), group_by(datamap, "region")
