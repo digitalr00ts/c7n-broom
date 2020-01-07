@@ -23,7 +23,10 @@ def group_by(
         }
 
     return dict(
-        map(lambda item_: (item_[0], group_by(item_[1], attribute)), group_by(datamap, "region"))
+        map(
+            lambda item_: (item_[0], group_by(item_[1], attribute)),
+            dict(group_by(datamap, "region")).items(),
+        )
     )
 
 
