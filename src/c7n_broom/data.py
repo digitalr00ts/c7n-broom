@@ -27,14 +27,14 @@ def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bo
 def count_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bool = False):
     """ Counts items by attribute """
     if not region_first:
-        return dict(
+        return tuple(
             map(
                 lambda item_: (item_[0], sum(1 for _ in item_[1])),
                 group_by(datamap, attribute=attribute, region_first=False),
             )
         )
 
-    return dict(
+    return tuple(
         map(
             lambda data_: (data_[0], count_by(data_[1], attribute, region_first=False)),
             group_by(datamap, attribute=attribute, region_first=True),
