@@ -7,7 +7,9 @@ from typing import Any, Dict, Sequence
 _LOGGER = logging.getLogger(__name__)
 
 
-def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bool = False):
+def group_by(
+    datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bool = False
+) -> Dict[str, Any]:
     """ Group query data by attribute """
 
     def sort_key(item_):
@@ -15,31 +17,27 @@ def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bo
         return item_[attribute]
 
     if not region_first:
-        return tuple(
-            (key_, tuple(val_))
+        return {
+            key_: tuple(val_)
             for key_, val_ in itertools.groupby(sorted(datamap, key=sort_key), key=sort_key)
-        )
+        }
 
-    return map(
-        lambda item_: (item_[0], group_by(item_[1], attribute)), group_by(datamap, "region")
+    return dict(
+        map(lambda item_: (item_[0], group_by(item_[1], attribute)), group_by(datamap, "region"))
     )
 
 
 def count_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bool = False):
     """ Counts items by attribute """
     if not region_first:
-        return tuple(
-            map(
-                lambda item_: (item_[0], sum(1 for _ in item_[1])),
-                group_by(datamap, attribute=attribute, region_first=False),
-            )
+        return map(
+            lambda item_: (item_[0], sum(1 for _ in item_[1])),
+            dict(group_by(datamap, attribute=attribute, region_first=False)).items(),
         )
 
-    return tuple(
-        map(
-            lambda data_: (data_[0], count_by(data_[1], attribute, region_first=False)),
-            group_by(datamap, attribute="region", region_first=False),
-        )
+    return map(
+        lambda data_: (data_[0], count_by(data_[1], attribute, region_first=False)),
+        dict(group_by(datamap, attribute="region", region_first=False)).items(),
     )
 
 
