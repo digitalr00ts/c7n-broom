@@ -1,6 +1,10 @@
 """ Process pricing information """
 import itertools
+import logging
 from typing import Any, Dict, Sequence
+
+
+_LOGGER = logging.getLogger(__name__)
 
 
 def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bool = False):
@@ -43,3 +47,10 @@ def group_by_size(datamap, region_first: bool = True):
 def count_by_size(datamap, region_first: bool = True):
     """ Counts items by size """
     return count_by(datamap, attribute="size", region_first=region_first)
+
+
+def count_by_region(datamap: Sequence[Dict[str, Any]], and_by_size: bool = False):
+    kwargs = {"attribute": "region", "region_first": False}
+    if and_by_size and datamap and any(map(lambda item_: item_.get("size", None), datamap)):
+        kwargs = {"attribute": "size", "region_first": True}
+    return group_by(datamap, **kwargs)
