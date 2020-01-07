@@ -39,7 +39,7 @@ def count_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bo
         )
 
     return map(
-        lambda data_: (data_[0], count_by(data_[1], attribute, region_first=False)),
+        lambda data_: (data_[0], dict(count_by(data_[1], attribute, region_first=False))),
         dict(group_by(datamap, attribute="region", region_first=False)).items(),
     )
 
