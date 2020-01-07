@@ -11,6 +11,7 @@ def group_by(datamap: Sequence[Dict[str, Any]], attribute: str, region_first: bo
     """ Group query data by attribute """
 
     def sort_key(item_):
+        _LOGGER.debug("SORT KEY: %s", item_)
         return item_[attribute]
 
     if not region_first:
