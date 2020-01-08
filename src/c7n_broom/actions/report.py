@@ -11,6 +11,7 @@ from typing import Any, Dict, Optional, Sequence, Tuple
 
 import jmespath
 from tabulate import tabulate
+from boto_remora.pricing import AWSResourceKeys
 
 from c7n_broom.actions.helper import account_profile_policy_str
 from c7n_broom.util import ExtendedEnum
@@ -33,6 +34,7 @@ class ResourceKey:
 
     id: str  # pylint: disable=invalid-name
     name: str = "SKIP"
+    type: str = "SKIP"
     size: str = "SKIP"
     region: str = "region"
     date: str = "SKIP"
@@ -56,11 +58,19 @@ class ResourceKeys(ExtendedEnum):
         date="CreationDate",
         # extras=(("BlockDeviceMappings", "BlockDeviceMappings"),)
     )
-    ebs = ResourceKey(id="VolumeId", size="Size", date="CreateTime",)
+    ebs = ResourceKey(
+        id="VolumeId", type=AWSResourceKeys.EBS.value.key, size="Size", date="CreateTime",
+    )
     ebs_snapshot = ResourceKey(
         id="SnapshotId", name="VolumeId", size="VolumeSize", date="StartTime",
     )
-    ec2 = ResourceKey(id="InstanceId", name="ImageId", size="InstanceType", date="LaunchTime",)
+    ec2 = ResourceKey(
+        id="InstanceId",
+        type=AWSResourceKeys.EC2.value.key,
+        name="ImageId",
+        size="InstanceType",
+        date="LaunchTime",
+    )
     rds = ResourceKey(
         id="DBInstanceArn",
         name="DBInstanceIdentifier",
