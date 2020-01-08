@@ -10,8 +10,8 @@ from pathlib import Path
 from typing import Any, Dict, Optional, Sequence, Tuple
 
 import jmespath
-from tabulate import tabulate
 from boto_remora.pricing import AWSResourceKeys
+from tabulate import tabulate
 
 from c7n_broom.actions.helper import account_profile_policy_str
 from c7n_broom.util import ExtendedEnum
