@@ -20,6 +20,10 @@ from c7n_broom.util import ExtendedEnum
 _LOGGER = logging.getLogger(__name__)
 
 
+def _cap_1letter(string: str) -> str:
+    return string[0].capitalize() + string[1:]
+
+
 class ResourceKeyDict(UserDict):  # pylint: disable=too-many-ancestors
     """ Custom dict for ResourceKey """
 
@@ -59,16 +63,18 @@ class ResourceKeys(ExtendedEnum):
         # extras=(("BlockDeviceMappings", "BlockDeviceMappings"),)
     )
     ebs = ResourceKey(
-        id="VolumeId", type=AWSResourceKeys.EBS.value.key, size="Size", date="CreateTime",
+        id="VolumeId",
+        type=_cap_1letter(AWSResourceKeys.EBS.value.key),
+        size="Size",
+        date="CreateTime",
     )
     ebs_snapshot = ResourceKey(
         id="SnapshotId", name="VolumeId", size="VolumeSize", date="StartTime",
     )
     ec2 = ResourceKey(
         id="InstanceId",
-        type=AWSResourceKeys.EC2.value.key,
+        type=_cap_1letter(AWSResourceKeys.EC2.value.key),
         name="ImageId",
-        size="InstanceType",
         date="LaunchTime",
     )
     rds = ResourceKey(
