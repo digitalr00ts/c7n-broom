@@ -139,16 +139,14 @@ def get_data_map(c7n_config, data_path="data") -> Sequence[Dict[str, Any]]:
             if item.get("tags")
             else dict()
         )
-    sorted(rawdata, key=lambda item_: item_["date"])
 
-    return rawdata
+    return sorted(rawdata, key=lambda item_: item_["date"])
 
 
 def get_table(c7n_config, fmt: str = "simple", data_path: str = "data") -> str:
     """ Generate table str """
-    return tabulate(
-        get_data_map(c7n_config, data_path), headers="keys", showindex=True, tablefmt=fmt
-    )
+    data = get_data_map(c7n_config, data_path)
+    return tabulate(data, headers="keys", showindex=True, tablefmt=fmt)
 
 
 def write(
