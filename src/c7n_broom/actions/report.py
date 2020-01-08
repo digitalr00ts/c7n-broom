@@ -48,7 +48,7 @@ class ResourceKey:
     @property
     def data(self) -> ResourceKeyDict:
         """ Return an "expanded" version of the resource key """
-        rtn_data = asdict(self)
+        rtn_data = dict(filter(lambda item_: item_[1] != "SKIP", asdict(self).items()))
         rtn_data.update(rtn_data.pop("extras"))
         return ResourceKeyDict(rtn_data)
 
