@@ -32,22 +32,26 @@ def groupby_region1st(datamap: Sequence[Dict[str, Any]], attribute: str) -> Dict
 
 def countby(datamap: Sequence[Dict[str, Any]], attribute: str):
     """ Counts items by attribute """
-    return map(
-        lambda item_: (item_[0], sum(1 for _ in item_[1])),
-        dict(groupby(datamap, attribute=attribute)).items(),
+    return dict(
+        map(
+            lambda item_: (item_[0], sum(1 for _ in item_[1])),
+            dict(groupby(datamap, attribute=attribute)).items(),
+        )
     )
 
 
 def countby_region1st(datamap: Sequence[Dict[str, Any]], attribute: str):
     """ Counts items by attribute grouped by region """
-    return map(
-        lambda data_: (data_[0], dict(countby(data_[1], attribute))),
-        dict(groupby(datamap, attribute="region")).items(),
+    return dict(
+        map(
+            lambda data_: (data_[0], countby(data_[1], attribute)),
+            dict(groupby(datamap, attribute="region")).items(),
+        )
     )
 
 
 def count(datamap: Sequence[Dict[str, Any]]):
     """ Counts items by region and by type if type exists """
     if datamap and datamap[0].get("type"):
-        countby_region1st(datamap, attribute="type")
+        return countby_region1st(datamap, attribute="type")
     return countby(datamap, attribute="region")
