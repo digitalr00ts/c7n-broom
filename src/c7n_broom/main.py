@@ -12,6 +12,8 @@ from vyper import Vyper
 
 import c7n_broom
 from c7n_broom import C7nConfig
+from c7n_broom.actions.report import get_data_map
+from c7n_broom.data import count
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -112,3 +114,12 @@ class Sweeper:
     def gen_html(self, html_dir: PathLike = "public"):
         """ Generate HTML report """
         return self.gen_reports("html", report_dir=html_dir)
+
+    @property
+    def counts(self):
+        """ Return count of resources from all jobs """
+        data = map(
+            lambda job_: (job_.get_str, count(get_data_map(job_, data_path=self.data_dir))),
+            self.jobs,
+        )
+        return dict(data)
