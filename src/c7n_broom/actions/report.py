@@ -33,7 +33,7 @@ class ResourceKeyDict(UserDict):  # pylint: disable=too-many-ancestors
 
 
 @dataclasses.dataclass(eq=True, frozen=True)
-class ResourceKey:
+class ResourceKey:  # pylint: disable=too-many-instance-attributes
     """ Data structure for descriptions of resources used in report generation """
 
     id: str  # pylint: disable=invalid-name
@@ -64,7 +64,7 @@ class ResourceKeys(ExtendedEnum):
     )
     ebs = ResourceKey(
         id="VolumeId",
-        type=_cap_1letter(AWSResourceKeys.EBS.value.key),
+        type=_cap_1letter(AWSResourceKeys.EBS.value.key),  # pylint: disable=no-member
         size="Size",
         date="CreateTime",
     )
@@ -73,7 +73,7 @@ class ResourceKeys(ExtendedEnum):
     )
     ec2 = ResourceKey(
         id="InstanceId",
-        type=_cap_1letter(AWSResourceKeys.EC2.value.key),
+        type=_cap_1letter(AWSResourceKeys.EC2.value.key),  # pylint: disable=no-member
         name="ImageId",
         date="LaunchTime",
     )
