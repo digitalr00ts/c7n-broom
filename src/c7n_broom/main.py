@@ -115,11 +115,11 @@ class Sweeper:
         """ Generate HTML report """
         return self.gen_reports("html", report_dir=html_dir)
 
-    @property
-    def counts(self):
+    def counts(self, grouped=False):
         """ Return count of resources from all jobs """
+        func = count if grouped else len
         data = map(
-            lambda job_: (job_.get_str, count(get_data_map(job_, data_path=self.data_dir))),
+            lambda job_: (job_.get_str, func(get_data_map(job_, data_path=self.data_dir))),
             self.jobs,
         )
         return dict(data)
