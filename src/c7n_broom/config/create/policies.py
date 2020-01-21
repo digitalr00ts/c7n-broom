@@ -51,7 +51,7 @@ def get_policy_files(
 ) -> Iterator[PathLike]:
     """ Returns an iterator of paths to policy files. """
     policy_names = filter_policies(account_settings, global_settings)
-    if (not path) and global_settings.get("path"):
+    if (not path) and global_settings and global_settings.get("path"):
         _LOGGER.info("Setting policy path to %s", path)
         path = global_settings.get("path")
     path = Path(path)
