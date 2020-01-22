@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-    Use setup.cfg to configure your project.
-"""
-
-import sys
-
+""" Use setup.cfg to configure setuptools. """
 from pkg_resources import VersionConflict, require
 from setuptools import setup
 
 
-# Check for minimal version of setuptools
-SETUPTOOLS_VER = "30.5.0"
+SETUPTOOLS_VER = "38.6.0"
 
 try:
     require("setuptools>=" + SETUPTOOLS_VER)
-except VersionConflict:
-    print("Error: version of setuptools is too old (<%s)!" % SETUPTOOLS_VER)
-    sys.exit(1)
+except VersionConflict as err:
+    import logging
+    import sys
+
+    logging.critical(err)
+    sys.exit(f"Setuptools <={SETUPTOOLS_VER} is required.")
 
 setup(use_scm_version=True)

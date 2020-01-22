@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=40.5.0"]
+requires = ["setuptools>=40.5.0", "wheel", "setuptools_scm[toml]>=3.4.2"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -22,4 +22,4 @@ lines_between_types = 0
 multi_line_output = 3
 not_skip = '__init__.py'
 default_section = 'THIRDPARTY'
-known_first_party = ['c7>n_broom']
+known_first_party = ['c7n_broom']
