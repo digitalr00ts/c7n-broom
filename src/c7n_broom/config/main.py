@@ -34,11 +34,14 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
     return config
 
 
+# TODO: change to factory and do not inherit from c7n's databag
 @dataclasses.dataclass()
 class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attributes
     """Configuration for c7n."""
 
-    profile: str = os.environ.get("AWS_PROFILE", "")
+    # FIXME: reading var env here seem to overwrite passed parameter
+    #        this maybe due to c7n's "databag"
+    profile: str  # = os.environ.get("AWS_PROFILE", "")
     configs: Iterable[str] = dataclasses.field(default_factory=list)
     dryrun: bool = True
 
@@ -97,6 +100,8 @@ class C7nConfig(c7n.config.Config):  # pylint: disable=too-many-instance-attribu
         else:
             if not self.resource_type:
                 self.resource_type = self._get_policy_resource
+
+        _LOGGER.debug("Created config object %s%s", self.profile, self.configs)
 
     @property
     def _get_policy_resource(self) -> Optional[str]:
