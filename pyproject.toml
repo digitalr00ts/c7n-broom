@@ -6,6 +6,13 @@ build-backend = "setuptools.build_meta"
 line-length = 98
 target-version = ['py37','py38']
 
+[tool.coverage]
+    [tool.coverage.run]
+    branch = true
+
+    [tool.coverage.report]
+    show_missing = true
+
 [tool.isort]
 atomic = true
 include_trailing_comma = true
@@ -15,4 +22,4 @@ lines_between_types = 0
 multi_line_output = 3
 not_skip = '__init__.py'
 default_section = 'THIRDPARTY'
-known_first_party = ['c7n_broom']
+known_first_party = ['c7>n_broom']
