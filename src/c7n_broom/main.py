@@ -77,6 +77,7 @@ class Sweeper:
             filelist = map(lambda jobs_: self._exec(action, jobs_[1], batch=None), jobsby.items())
             return tuple(chain.from_iterable(filelist))
 
+        _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
         with ThreadPoolExecutor() as executor:
             future_data = tuple(executor.map(action, jobs))
         _LOGGER.debug("%s data files written.", len(future_data))
