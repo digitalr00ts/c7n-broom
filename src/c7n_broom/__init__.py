@@ -3,7 +3,7 @@ import logging as _logging
 
 import pkg_resources
 
-from c7n_broom.config import C7nConfig
+from c7n_broom.config import C7nCfg
 from c7n_broom.main import Sweeper
 
 from . import actions, config, data
@@ -15,7 +15,7 @@ except pkg_resources.DistributionNotFound:
     __version__ = ""
 
 
-__all__ = ["C7nConfig", "Sweeper"]
+__all__ = ["C7nCfg", "Sweeper"]
 
 _logging.getLogger(__name__).addHandler(_logging.NullHandler())
 _logging.getLogger("custodian").setLevel(_logging.INFO)

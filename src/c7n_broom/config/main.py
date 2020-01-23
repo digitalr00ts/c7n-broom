@@ -35,8 +35,8 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
 
 
 @dataclasses.dataclass()
-class C7nConfig:  # pylint: disable=too-many-instance-attributes
-    """Configuration for c7n."""
+class C7nCfg:  # pylint: disable=too-many-instance-attributes
+    """ Configuration adopter for c7n."""
 
     profile: str = os.environ.get("AWS_PROFILE", "")
     configs: Iterable[str] = dataclasses.field(default_factory=list)

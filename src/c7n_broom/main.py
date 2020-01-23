@@ -11,7 +11,7 @@ from typing import Any, Dict, Iterator, Optional, Sequence, Union
 from vyper import Vyper
 
 import c7n_broom
-from c7n_broom import C7nConfig
+from c7n_broom import C7nCfg
 from c7n_broom.actions.report import get_data_map
 from c7n_broom.data import count
 
@@ -29,7 +29,7 @@ class Sweeper:
     report_dir: PathLike = Path("data").joinpath("reports")
     skip_unauthed: bool = False
     auth_check: bool = True
-    jobs: Sequence[C7nConfig] = field(init=False, repr=False)
+    jobs: Sequence[C7nCfg] = field(init=False, repr=False)
 
     def __post_init__(self):
         if not self.settings:
@@ -56,16 +56,16 @@ class Sweeper:
         return rtn_jobs
 
     @property
-    def jobs_by_profile(self) -> Dict[str, Sequence[C7nConfig]]:
+    def jobs_by_profile(self) -> Dict[str, Sequence[C7nCfg]]:
         """ Return a dict of jobs by profile name """
         return self._asdict_by_attrib("profile")
 
     @property
-    def jobs_by_policies(self) -> Dict[str, Sequence[C7nConfig]]:
+    def jobs_by_policies(self) -> Dict[str, Sequence[C7nCfg]]:
         """ Return a dict of jobs by policy name """
         return self._asdict_by_attrib("configs")
 
-    def get_account_jobs(self, account: str, use_profile: bool = True) -> Iterator[C7nConfig]:
+    def get_account_jobs(self, account: str, use_profile: bool = True) -> Iterator[C7nCfg]:
         """ Get an iterator of only jobs for an account """
         attrib = "profile" if use_profile else "account_id"
         return self._get_by_attrib(attribute=attrib, attribute_val=account)

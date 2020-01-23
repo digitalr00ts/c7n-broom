@@ -9,14 +9,14 @@ from typing import Any, Dict, Iterator, Optional
 import c7n.commands
 
 from c7n_broom.actions.helper import account_profile_policy_str
-from c7n_broom.config import C7nConfig
+from c7n_broom.config import C7nCfg
 
 
 _LOGGING = logging.getLogger(__name__)
 
 
 def run(
-    c7n_config: C7nConfig,
+    c7n_config: C7nCfg,
     data_dir: PathLike = "data",
     dryrun: bool = True,
     telemetry_disabled: bool = True,
@@ -63,7 +63,7 @@ def run(
 
 
 def query(
-    c7n_config: C7nConfig,
+    c7n_config: C7nCfg,
     data_dir: PathLike = Path("data").joinpath("query"),
     telemetry_disabled: bool = True,
 ):
@@ -74,7 +74,7 @@ def query(
 
 
 def execute(
-    c7n_config: C7nConfig,
+    c7n_config: C7nCfg,
     data_dir: PathLike = Path("data").joinpath("query"),
     telemetry_disabled: bool = True,
 ):
@@ -85,7 +85,7 @@ def execute(
 
 
 def read_data(
-    c7n_config: C7nConfig, data_dir: PathLike = Path("data").joinpath("query"),
+    c7n_config: C7nCfg, data_dir: PathLike = Path("data").joinpath("query"),
 ) -> Optional[Dict[str, Any]]:
     """
         Return data from query data.

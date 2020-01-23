@@ -10,7 +10,7 @@ from boto_remora.aws import Sts
 from vyper import Vyper
 
 from c7n_broom.config.create.policies import get_policy_files
-from c7n_broom.config.main import C7nConfig
+from c7n_broom.config.main import C7nCfg
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -45,9 +45,7 @@ def account_c7nconfigs(
     _LOGGER.info("Creating policies for profile %s", name)
     _LOGGER.debug(c7nconfig_kwargs)
     # TODO: remove hardcoded disabling metrics and move to broom config
-    return map(
-        lambda policy_name: C7nConfig(configs=(policy_name,), **c7nconfig_kwargs), policies,
-    )
+    return map(lambda policy_name: C7nCfg(configs=(policy_name,), **c7nconfig_kwargs), policies,)
 
 
 def c7nconfigs(  # pylint: disable=too-many-locals
