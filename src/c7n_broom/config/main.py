@@ -143,6 +143,6 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     def c7n(self) -> c7n.config.Config:
         """ Cast to c7n Config object """
         rtn = c7n.config.Config().empty()
-        for key_, val_ in dataclasses.astuple(self):
+        for key_, val_ in dataclasses.asdict(self).items():
             setattr(rtn, key_, val_)
         return rtn
