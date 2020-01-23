@@ -4,6 +4,7 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from functools import partial
+from itertools import chain
 from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, Iterator, Optional, Sequence, Union
@@ -70,32 +71,30 @@ class Sweeper:
         attrib = "profile" if use_profile else "account_id"
         return self._get_by_attrib(attribute=attrib, attribute_val=account)
 
-    @staticmethod
-    def _exec(action, jobs):
-        filelist = list()
-        for profile_, jobs_ in jobs.items():
-            _LOGGER.info("Executing for %s", profile_)
-            with ThreadPoolExecutor() as executor:
-                future_data = tuple(executor.map(action, jobs_))
-            _LOGGER.debug("%s data files written.", len(future_data))
-            filelist.extend(future_data)
-        return filelist
+    def _exec(self, action, jobs, batch=None):
+        if batch:
+            jobsby = getattr(self, "jobs_by_" + batch)
+            filelist = map(lambda jobs_: self._exec(action, jobs_[1], batch=None), jobsby.items())
+            return tuple(chain.from_iterable(filelist))
 
-    def query(self, telemetry=False, batch="profile"):
+        with ThreadPoolExecutor() as executor:
+            future_data = tuple(executor.map(action, jobs))
+        _LOGGER.debug("%s data files written.", len(future_data))
+        return future_data
+
+    def query(self, telemetry=False, batch=None):
         """ Run without actions. Dryrun true. """
-        jobs = getattr(self, "jobs_by_" + batch)
         action = partial(
             c7n_broom.actions.query, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return self._exec(action, jobs)
+        return self._exec(action, self.jobs, batch)
 
-    def execute(self, telemetry=False, batch="profile"):
+    def execute(self, telemetry=False, batch=None):
         """ Run actions. Dryrun false. """
-        jobs = getattr(self, "jobs_by_" + batch)
         action = partial(
             c7n_broom.actions.execute, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return self._exec(action, jobs)
+        return self._exec(action, self.jobs, batch)
 
     def gen_reports(self, fmt="md", report_dir=None):
         """ Generate reports. Markdown by default. """
