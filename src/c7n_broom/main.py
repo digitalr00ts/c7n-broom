@@ -79,8 +79,8 @@ class Sweeper:
 
         _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
         with ThreadPoolExecutor() as executor:
-            future_data = tuple(executor.map(action, jobs))
-        _LOGGER.debug("%s data files written.", len(future_data))
+            future_data = executor.map(action, jobs)
+        # _LOGGER.debug("%s data files written.", len(future_data))
         return future_data
 
     def query(self, telemetry=False, batch=None):
