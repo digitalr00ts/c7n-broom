@@ -77,11 +77,6 @@ class C7nConfig:  # pylint: disable=too-many-instance-attributes
         if not self.profile:
             raise TypeError("Profile must be set.")
 
-        for k, v in c7n.config.Config.empty().items():
-            if k not in dataclasses.asdict(self).keys():
-                _LOGGER.debug("Adding missing attribute %s:%s.", k, v)
-                setattr(self, k, v)
-
         c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)
 
         self.regions = set(self.regions)
