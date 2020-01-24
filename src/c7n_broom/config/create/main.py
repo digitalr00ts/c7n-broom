@@ -45,7 +45,7 @@ def account_c7nconfigs(
     _LOGGER.info("Creating policies for profile %s", name)
     _LOGGER.debug(c7nconfig_kwargs)
     # TODO: remove hardcoded disabling metrics and move to broom config
-    return map(lambda policy_name: C7nCfg(configs=(policy_name,), **c7nconfig_kwargs), policies,)
+    return map(lambda policy_name: C7nCfg(configs=(policy_name,), **c7nconfig_kwargs), policies)
 
 
 def c7nconfigs(
