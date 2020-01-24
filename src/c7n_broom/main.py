@@ -1,6 +1,6 @@
 """ Main module for c7n_broom """
 import logging
-from collections import defaultdict
+from collections import defaultdict, deque
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from functools import partial
@@ -75,7 +75,7 @@ class Sweeper:
         if batch:
             jobsby = getattr(self, "jobs_by_" + batch)
             filelist = map(lambda jobs_: self._exec(action, jobs_[1], batch=None), jobsby.items())
-            return tuple(chain.from_iterable(filelist))
+            return chain.from_iterable(filelist)
 
         _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
         with ThreadPoolExecutor() as executor:
@@ -88,14 +88,14 @@ class Sweeper:
         action = partial(
             c7n_broom.actions.query, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return self._exec(action, self.jobs, batch)
+        return deque(self._exec(action, self.jobs, batch))
 
     def execute(self, telemetry=False, batch=None):
         """ Run actions. Dryrun false. """
         action = partial(
             c7n_broom.actions.execute, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return self._exec(action, self.jobs, batch)
+        return deque(self._exec(action, self.jobs, batch))
 
     def gen_reports(self, fmt="md", report_dir=None):
         """ Generate reports. Markdown by default. """
@@ -107,7 +107,7 @@ class Sweeper:
             data_path=self.data_dir,
             output_path=report_dir,
         )
-        filelist = tuple(map(str, filter(None, map(writer, self.jobs))))
+        filelist = deque(map(str, filter(None, map(writer, self.jobs))))
         _LOGGER.info("%s report file written", len(filelist))
         return filelist
 
