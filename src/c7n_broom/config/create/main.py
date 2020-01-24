@@ -48,7 +48,7 @@ def account_c7nconfigs(
     return map(lambda policy_name: C7nCfg(configs=(policy_name,), **c7nconfig_kwargs), policies,)
 
 
-def c7nconfigs(  # pylint: disable=too-many-locals
+def c7nconfigs(
     config: Union[Vyper, Dict[str, Any]],
     skip_unauthed: Optional[bool] = None,
     skip_auth_check: Optional[bool] = None,
@@ -77,8 +77,7 @@ def c7nconfigs(  # pylint: disable=too-many-locals
         accounts = {profile: None for profile in available_profiles}
 
     if not skip_auth_check and accounts:
-        aws_stss = tuple(map(Sts, available_profiles))
-        accountids = {sts_.profile_name: sts_.account for sts_ in aws_stss}
+        accountids = {sts_.profile_name: sts_.account for sts_ in map(Sts, available_profiles)}
         authed_profiles = dict(filter(lambda aid_: aid_[1], accountids.items()))
         unauthed_profiles = set(accounts).difference(authed_profiles)
         msg = f"Not all accounts can access the AWS API {unauthed_profiles}."
