@@ -145,8 +145,8 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         """ Cast to c7n Config object """
         rtn = c7n.config.Config().empty()
         for key_, val_ in dataclasses.asdict(self).items():
-            if isinstance(val_, abc.Sequence):
-                _LOGGER.debug("Cast to list, %s", (key_, val_))
+            if isinstance(val_, abc.Set):
+                _LOGGER.debug("Cast set to list, %s", (key_, val_))
                 val_ = list(val_)
             setattr(rtn, key_, val_)
         return rtn
