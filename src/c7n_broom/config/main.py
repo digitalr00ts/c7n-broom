@@ -146,7 +146,8 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         rtn = c7n.config.Config().empty()
         for key_, val_ in dataclasses.asdict(self).items():
             if isinstance(val_, abc.Set):
-                _LOGGER.debug("Cast set to list, %s", (key_, val_))
                 val_ = list(val_)
+            elif isinstance(val_, Path):
+                val_ = str(val_)
             setattr(rtn, key_, val_)
         return rtn
