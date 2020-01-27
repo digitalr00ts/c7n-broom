@@ -143,11 +143,12 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     def c7n(self) -> c7n.config.Config:
         """ Cast to c7n Config and return new object """
         rtn = c7n.config.Config().empty()
-        # PosixPath is not JSON serializable
-        setattr(rtn, "configs", [str(val_) for val_ in self.configs])
-        # Set not hashable and is not JSON serializable
         for key_, val_ in dataclasses.asdict(self).items():
-            if isinstance(val_, abc.Set):
+            # PosixPath is not JSON serializable
+            if key_ == "configs":
+                val_ = [str(cfg_) for cfg_ in self.configs]
+            # Set is not JSON serializable
+            elif isinstance(val_, abc.Set):
                 val_ = list(val_)
             setattr(rtn, key_, val_)
         return rtn
