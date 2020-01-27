@@ -3,7 +3,6 @@ import dataclasses
 import itertools
 import logging
 import os
-import pathlib
 from collections import abc, deque
 from os import PathLike
 from pathlib import Path
@@ -40,7 +39,7 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     """ Configuration adopter for c7n."""
 
     profile: str = os.environ.get("AWS_PROFILE", "")
-    configs: Iterable[Union[Path,PathLike,str]] = dataclasses.field(default_factory=deque)
+    configs: Iterable[Union[Path, PathLike, str]] = dataclasses.field(default_factory=deque)
     dryrun: bool = True
 
     output_dir: str = ""
@@ -56,8 +55,8 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     format: str = "simple"
     days: float = 1
     no_default_fields: bool = False
-    field: List[str] = dataclasses.field(default_factory=list)
-    raw: Optional[pathlib.Path] = None
+    field: Iterable[str] = dataclasses.field(default_factory=list)
+    raw: Optional[Path] = None
 
     region: str = os.environ.get("AWS_DEFAULT_REGION", "us-east-1")
     metrics_enabled: bool = True
@@ -78,7 +77,7 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         if not self.profile:
             raise TypeError("Profile must be set.")
 
-        c7n_home = pathlib.Path.home().joinpath(".cache/c7n").joinpath(self.profile)
+        c7n_home = Path.home().joinpath(".cache/c7n").joinpath(self.profile)
 
         self.regions = set(self.regions)
 
