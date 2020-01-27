@@ -4,10 +4,10 @@ import itertools
 import logging
 import os
 import pathlib
-from collections import abc
+from collections import abc, deque
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 import c7n.config
 import yaml
@@ -40,7 +40,7 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     """ Configuration adopter for c7n."""
 
     profile: str = os.environ.get("AWS_PROFILE", "")
-    configs: Iterable[str] = dataclasses.field(default_factory=list)
+    configs: Iterable[Union[Path,PathLike,str]] = dataclasses.field(default_factory=deque)
     dryrun: bool = True
 
     output_dir: str = ""
@@ -142,12 +142,13 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
 
     @property
     def c7n(self) -> c7n.config.Config:
-        """ Cast to c7n Config object """
+        """ Cast to c7n Config and return new object """
         rtn = c7n.config.Config().empty()
+        # PosixPath is not JSON serializable
+        setattr(rtn, "configs", [str(val_) for val_ in self.configs])
+        # Set not hashable and is not JSON serializable
         for key_, val_ in dataclasses.asdict(self).items():
             if isinstance(val_, abc.Set):
                 val_ = list(val_)
-            elif isinstance(val_, Path):
-                val_ = str(val_)
             setattr(rtn, key_, val_)
         return rtn
