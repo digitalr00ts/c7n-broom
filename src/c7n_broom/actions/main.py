@@ -1,5 +1,4 @@
 """ main package for c7n_broom.actions """
-import dataclasses
 import json
 import logging
 from os import PathLike
@@ -49,12 +48,12 @@ def run(
 
     c7n.commands.run(c7n_config.c7n)  # pylint: disable=no-value-for-parameter
 
-    report_settings = dataclasses.replace(c7n_config)
+    report_settings = c7n_config.c7n
     report_settings.days = report_minutes / MINUTES_IN_DAY
     datafile = Path(data_dir).joinpath(profile_policies_str).with_suffix(".json")
     with datafile.open(mode="wt") as data_fd:
         report_settings.raw = data_fd
-        c7n.commands.report(report_settings.c7n)  # pylint: disable=no-value-for-parameter
+        c7n.commands.report(report_settings)  # pylint: disable=no-value-for-parameter
 
     print(f"COMPLETED: {profile_policies_str}")
     logging.info("COMPLETED %s", profile_policies_str)
