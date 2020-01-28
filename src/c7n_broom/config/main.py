@@ -4,6 +4,7 @@ import itertools
 import logging
 import os
 from collections import abc, deque
+from io import IOBase
 from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Union
@@ -143,6 +144,10 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     def c7n(self) -> c7n.config.Config:
         """ Cast to c7n Config and return new object """
         rtn = c7n.config.Config().empty()
+        if isinstance(self.raw, IOBase):
+            raise RuntimeError(
+                f"Cannot cast to c7n.config. Attribute self.raw is set to {self.raw}"
+            )
         for key_, val_ in dataclasses.asdict(self).items():
             # PosixPath is not JSON serializable
             if key_ == "configs":
