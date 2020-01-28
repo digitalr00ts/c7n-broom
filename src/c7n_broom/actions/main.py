@@ -56,8 +56,9 @@ def run(
         c7n.commands.report(report_settings)  # pylint: disable=no-value-for-parameter
 
     print(f"COMPLETED: {profile_policies_str}")
-    logging.info("COMPLETED %s", profile_policies_str)
-    logging.debug("Data file writen %s", datafile)
+    _LOGGING.info("COMPLETED %s", profile_policies_str)
+    _LOGGING.debug("Data file writen %s", datafile)
+
     return datafile
 
 
