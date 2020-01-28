@@ -4,9 +4,8 @@ import logging
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
-import boto_remora.aws
 import botocore
-from boto_remora.aws import Sts
+from boto_remora.aws import Ec2, Sts
 from vyper import Vyper
 
 from c7n_broom.config.create.policies import get_policy_files
@@ -29,7 +28,7 @@ def account_c7nconfigs(
         global_settings.get("policies") if global_settings else dict(),
     )
     # TODO: remove skip regions in favor of setting regions in broom config
-    regions = boto_remora.aws.Ec2(name).available_regions if not skip_regions else list()
+    regions = Ec2(name).available_regions if not skip_regions else list()
 
     c7n_home = global_settings.get("c7n_home")
     c7nconfig_kwargs = {
