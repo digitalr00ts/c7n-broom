@@ -144,8 +144,6 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     @property
     def c7n(self) -> c7n.config.Config:
         """ Cast to c7n Config and return new object """
-        rtn = c7n.config.Config().empty()
-
         if isinstance(self.raw, IOBase):
             raise RuntimeError(
                 f"Cannot cast to c7n.config. Attribute self.raw is set to {self.raw}"
@@ -158,5 +156,7 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         }
         # PosixPath is not JSON serializable
         tmpdata["configs"] = [str(cfg_) for cfg_ in self.configs]
+
+        rtn = c7n.config.Config().empty()
         rtn.update(tmpdata)
         return rtn
