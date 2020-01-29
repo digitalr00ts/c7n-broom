@@ -4,6 +4,7 @@ import itertools
 import logging
 import os
 from collections import abc, deque
+from dataclasses import asdict, dataclass
 from io import IOBase
 from os import PathLike
 from pathlib import Path
@@ -35,7 +36,7 @@ def get_config(filename: str = "config", path: PathLike = Path(".")):
     return config
 
 
-@dataclasses.dataclass()
+@dataclass()
 class C7nCfg:  # pylint: disable=too-many-instance-attributes
     """ Configuration adopter for c7n."""
 
@@ -64,12 +65,12 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     debug: bool = False
     # verbose: bool = True
 
-    account_id: Optional[str] = dataclasses.field(default=None)
-    assume_role: Optional[str] = dataclasses.field(default=None)
-    external_id: Optional[str] = dataclasses.field(default=None)
-    log_group: Optional[str] = dataclasses.field(default=None)
-    authorization_file: Optional[str] = dataclasses.field(default=None)
-    tracer: str = dataclasses.field(default="default")
+    account_id: Optional[str] = None
+    assume_role: Optional[str] = None
+    external_id: Optional[str] = None
+    log_group: Optional[str] = None
+    authorization_file: Optional[str] = None
+    tracer: str = "default"
 
     # IDK, but c7n will throw errors w/o it.
     vars: Optional[List] = None
@@ -144,16 +145,18 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     def c7n(self) -> c7n.config.Config:
         """ Cast to c7n Config and return new object """
         rtn = c7n.config.Config().empty()
+
         if isinstance(self.raw, IOBase):
             raise RuntimeError(
                 f"Cannot cast to c7n.config. Attribute self.raw is set to {self.raw}"
             )
-        for key_, val_ in dataclasses.asdict(self).items():
-            # PosixPath is not JSON serializable
-            if key_ == "configs":
-                val_ = [str(cfg_) for cfg_ in self.configs]
-            # Set is not JSON serializable
-            elif isinstance(val_, abc.Set):
-                val_ = list(val_)
-            setattr(rtn, key_, val_)
+
+        # Set is not JSON serializable
+        tmpdata = {
+            key_: list(val_) if isinstance(val_, abc.Set) else val_
+            for key_, val_ in asdict(self).items()
+        }
+        # PosixPath is not JSON serializable
+        tmpdata["configs"] = [str(cfg_) for cfg_ in self.configs]
+        rtn.update(tmpdata)
         return rtn
