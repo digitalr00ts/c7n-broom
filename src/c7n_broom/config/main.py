@@ -146,7 +146,7 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         """ Cast to c7n Config and return new object """
         if isinstance(self.raw, IOBase):
             raise RuntimeError(
-                f"Cannot cast to c7n.config. Attribute self.raw is set to {self.raw}"
+                f"Cannot serialize type IOBase. Raw is set to {self.raw}"
             )
 
         # Set is not JSON serializable
