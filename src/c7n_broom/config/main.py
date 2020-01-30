@@ -70,6 +70,7 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     external_id: Optional[str] = None
     log_group: Optional[str] = None
     authorization_file: Optional[str] = None
+    skip_validation: bool = False
     tracer: str = "default"
 
     # IDK, but c7n will throw errors w/o it.
