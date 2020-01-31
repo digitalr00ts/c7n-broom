@@ -1,7 +1,7 @@
 """ Main module for c7n_broom """
 import logging
 from collections import defaultdict, deque
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass, field
 from functools import partial
 from itertools import chain
@@ -78,7 +78,7 @@ class Sweeper:
             return chain.from_iterable(filelist)
 
         _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
-        with ThreadPoolExecutor() as executor:
+        with ProcessPoolExecutor() as executor:
             future_data = executor.map(action, jobs)
         # _LOGGER.debug("%s data files written.", len(future_data))
         return future_data
