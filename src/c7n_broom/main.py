@@ -47,14 +47,14 @@ class Sweeper:
             )
         )
 
-    def _get_by_attrib(self, attribute: str, attribute_val: str):
+    def _filter_by_attrib(self, attribute: str, attribute_val: str):
         return filter(lambda job_: getattr(job_, attribute, False) == attribute_val, self.jobs)
 
     def _asdict_by_attrib(self, attribute: str):
-        rtn_jobs = defaultdict(deque)
+        rtn = defaultdict(deque)
         for job_ in self.jobs:
-            rtn_jobs[str(getattr(job_, attribute))].append(job_)
-        return rtn_jobs
+            rtn[str(getattr(job_, attribute))].append(job_)
+        return rtn
 
     @property
     def jobs_by_profile(self) -> Dict[str, Sequence[C7nCfg]]:
@@ -69,7 +69,7 @@ class Sweeper:
     def get_account_jobs(self, account: str, use_profile: bool = True) -> Iterator[C7nCfg]:
         """ Get an iterator of only jobs for an account """
         attrib = "profile" if use_profile else "account_id"
-        return self._get_by_attrib(attribute=attrib, attribute_val=account)
+        return self._filter_by_attrib(attribute=attrib, attribute_val=account)
 
     def _exec(self, action, jobs, batch=None):
         if batch:
