@@ -51,7 +51,7 @@ class Sweeper:
         return filter(lambda job_: getattr(job_, attribute, False) == attribute_val, self.jobs)
 
     def _asdict_by_attrib(self, attribute: str):
-        rtn_jobs = defaultdict(list)
+        rtn_jobs = defaultdict(deque)
         for job_ in self.jobs:
             rtn_jobs[str(getattr(job_, attribute))].append(job_)
         return rtn_jobs
