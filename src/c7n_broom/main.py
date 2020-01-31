@@ -47,8 +47,10 @@ class Sweeper:
             )
         )
 
-    def _get_job_settings(self, attrib) -> Set[Any]:
-        return {getattr(cfg_, attrib) for cfg_ in self.jobs}
+    def _get_job_settings(self, attrib, jobs=None) -> Set[Any]:
+        if jobs is None:
+            jobs = self.jobs
+        return {getattr(cfg_, attrib) for cfg_ in jobs}
 
     def _filter_by_attrib(self, attribute: str, attribute_val: str):
         return filter(lambda job_: getattr(job_, attribute, False) == attribute_val, self.jobs)
@@ -66,7 +68,7 @@ class Sweeper:
 
     def _exec(self, action, jobs, batch: Optional[str] = "profile"):
         """ Batch by profile or account """
-        batch_len = len(self._get_job_settings(batch)) if batch else 0
+        batch_len = len(self._get_job_settings(batch, jobs)) if batch else 0
         if batch_len > 1:
             _LOGGER.debug("Found %s %ss", batch_len, batch)
             files = map(
