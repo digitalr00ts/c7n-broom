@@ -39,7 +39,7 @@ class Sweeper:
         for attrib in ("data_dir", "report_dir", "auth_check", "skip_unauthed"):
             if broom_settings.get(attrib):
                 setattr(self, attrib, broom_settings.get(attrib))
-        self.jobs = tuple(
+        self.jobs = deque(
             c7n_broom.config.create.c7nconfigs(
                 self.settings,
                 skip_unauthed=self.skip_unauthed,
