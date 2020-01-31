@@ -66,7 +66,9 @@ class Sweeper:
 
     def _exec(self, action, jobs, batch: Optional[str] = "profile"):
         """ Batch by profile or account """
-        if batch and len(self._get_job_settings(batch)) > 1:
+        batch_len = len(self._get_job_settings(batch)) if batch else 0
+        if batch_len > 1:
+            _LOGGER.debug("Found %s %ss", batch_len, batch)
             files = map(
                 lambda jobs_: self._exec(
                     action, jobs_[1], batch=None if batch == "account_id" else "account_id",
