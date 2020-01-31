@@ -67,19 +67,21 @@ class Sweeper:
     def _exec(self, action, jobs, batch: Optional[str] = "profile"):
         """ Batch by profile or account """
         if batch and len(self._get_job_settings(batch)) > 1:
-            batch_ = None if batch == "account_id" else "account_id"
-            filelist = map(
-                lambda jobs_: self._exec(action, jobs_[1], batch=batch_),
+            files = map(
+                lambda jobs_: self._exec(
+                    action, jobs_[1], batch=None if batch == "account_id" else "account_id",
+                ),
                 self._asdict_by_attrib(batch).items(),
             )
-            return chain.from_iterable(filelist)
+            rtn = chain.from_iterable(files)
+        else:
+            _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
+            with ThreadPoolExecutor() as executor:
+                future_data = executor.map(action, jobs)
+            rtn = deque(future_data)
+            _LOGGER.debug("%s data files written.", len(rtn))
 
-        _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
-        with ThreadPoolExecutor() as executor:
-            future_data = executor.map(action, jobs)
-        datafiles = deque(future_data)
-        _LOGGER.debug("%s data files written.", len(datafiles))
-        return datafiles
+        return rtn
 
     def query(self, telemetry=False):
         """ Run without actions. Dryrun true. """
