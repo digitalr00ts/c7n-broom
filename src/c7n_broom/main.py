@@ -7,7 +7,7 @@ from functools import partial
 from itertools import chain
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Sequence, Union
+from typing import Any, Dict, Iterator, Optional, Sequence, Set, Union
 
 from vyper import Vyper
 
@@ -46,6 +46,21 @@ class Sweeper:
                 skip_auth_check=not self.auth_check,
             )
         )
+
+    def _get_job_settings(self, attrib) -> Set[Any]:
+        return {getattr(cfg_, attrib) for cfg_ in self.jobs}
+
+    @property
+    def job_resources(self):
+        return self._get_job_settings("resources")
+
+    @property
+    def job_profiles(self):
+        return self._get_job_settings("profiles")
+
+    @property
+    def job_accounts(self):
+        return self._get_job_settings("accounts")
 
     def _filter_by_attrib(self, attribute: str, attribute_val: str):
         return filter(lambda job_: getattr(job_, attribute, False) == attribute_val, self.jobs)
