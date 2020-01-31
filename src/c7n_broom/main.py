@@ -1,7 +1,7 @@
 """ Main module for c7n_broom """
 import logging
 from collections import defaultdict, deque
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from functools import partial
 from itertools import chain
@@ -50,18 +50,6 @@ class Sweeper:
     def _get_job_settings(self, attrib) -> Set[Any]:
         return {getattr(cfg_, attrib) for cfg_ in self.jobs}
 
-    @property
-    def job_resources(self):
-        return self._get_job_settings("resources")
-
-    @property
-    def job_profiles(self):
-        return self._get_job_settings("profiles")
-
-    @property
-    def job_accounts(self):
-        return self._get_job_settings("accounts")
-
     def _filter_by_attrib(self, attribute: str, attribute_val: str):
         return filter(lambda job_: getattr(job_, attribute, False) == attribute_val, self.jobs)
 
@@ -71,46 +59,41 @@ class Sweeper:
             rtn[str(getattr(job_, attribute))].append(job_)
         return rtn
 
-    @property
-    def jobs_by_profile(self) -> Dict[str, Sequence[C7nCfg]]:
-        """ Return a dict of jobs by profile name """
-        return self._asdict_by_attrib("profile")
-
-    @property
-    def jobs_by_policies(self) -> Dict[str, Sequence[C7nCfg]]:
-        """ Return a dict of jobs by policy name """
-        return self._asdict_by_attrib("configs")
-
     def get_account_jobs(self, account: str, use_profile: bool = True) -> Iterator[C7nCfg]:
         """ Get an iterator of only jobs for an account """
         attrib = "profile" if use_profile else "account_id"
         return self._filter_by_attrib(attribute=attrib, attribute_val=account)
 
-    def _exec(self, action, jobs, batch=None):
-        if batch:
-            jobsby = getattr(self, "jobs_by_" + batch)
-            filelist = map(lambda jobs_: self._exec(action, jobs_[1], batch=None), jobsby.items())
+    def _exec(self, action, jobs, batch: Optional[str] = "profile"):
+        """ Batch by profile or account """
+        if batch and len(self._get_job_settings(batch)) > 1:
+            batch_ = None if batch == "account_id" else "account_id"
+            filelist = map(
+                lambda jobs_: self._exec(action, jobs_[1], batch=batch_),
+                self._asdict_by_attrib(batch).items(),
+            )
             return chain.from_iterable(filelist)
 
         _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
-        with ProcessPoolExecutor() as executor:
+        with ThreadPoolExecutor() as executor:
             future_data = executor.map(action, jobs)
-        # _LOGGER.debug("%s data files written.", len(future_data))
-        return future_data
+        datafiles = deque(future_data)
+        _LOGGER.debug("%s data files written.", len(datafiles))
+        return datafiles
 
-    def query(self, telemetry=False, batch=None):
+    def query(self, telemetry=False):
         """ Run without actions. Dryrun true. """
         action = partial(
             c7n_broom.actions.query, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return deque(self._exec(action, self.jobs, batch))
+        return deque(self._exec(action, self.jobs))
 
-    def execute(self, telemetry=False, batch=None):
+    def execute(self, telemetry=False):
         """ Run actions. Dryrun false. """
         action = partial(
             c7n_broom.actions.execute, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return deque(self._exec(action, self.jobs, batch))
+        return deque(self._exec(action, self.jobs))
 
     def gen_reports(self, fmt="md", report_dir=None):
         """ Generate reports. Markdown by default. """
