@@ -66,7 +66,7 @@ class Sweeper:
         attrib = "profile" if use_profile else "account_id"
         return self._filter_by_attrib(attribute=attrib, attribute_val=account)
 
-    def _exec(self, action, jobs, batch: Optional[str] = None):
+    def _exec(self, action, jobs, batch: Optional[str] = "profile"):
         """ Multiprocess actions """
         # It was believed that:
         # Because of session caching in c7n, we batch by profile and account
@@ -86,7 +86,7 @@ class Sweeper:
             # There are bug's in c7n's cache so lets not use it
             for cf_ in filter(lambda cf_: Path(cf_).is_file(), self._get_job_settings("cache")):
                 Path(cf_).unlink()
-            with ThreadPoolExecutor() as executor:
+            with ThreadPoolExecutor(max_workers=3) as executor:
                 executor.map(action, jobs)
 
     def query(self, telemetry=False):
