@@ -66,8 +66,11 @@ class Sweeper:
         attrib = "profile" if use_profile else "account_id"
         return self._filter_by_attrib(attribute=attrib, attribute_val=account)
 
-    def _exec(self, action, jobs, batch: Optional[str] = "profile"):
-        """ Batch by profile or account """
+    def _exec(self, action, jobs, batch: Optional[str] = None):
+        """ Multiprocess actions """
+        # It was believed that:
+        # Because of session caching in c7n, we batch by profile and account
+        # Leaving code until confident it is not needed.
         batch_len = len(self._get_job_settings(batch, jobs)) if batch else 0
         if batch_len > 1:
             _LOGGER.debug("Found %s %ss", batch_len, batch)
@@ -77,15 +80,14 @@ class Sweeper:
                 ),
                 self._asdict_by_attrib(batch).items(),
             )
-            rtn = chain.from_iterable(files)
+            return chain.from_iterable(files)
         else:
             _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
+            # There are bug's in c7n's cache so lets not use it
+            for cf_ in filter(lambda cf_: Path(cf_).is_file(), self._get_job_settings("cache")):
+                Path(cf_).unlink()
             with ThreadPoolExecutor() as executor:
-                future_data = executor.map(action, jobs)
-            rtn = deque(future_data)
-            _LOGGER.debug("%s data files written.", len(rtn))
-
-        return rtn
+                executor.map(action, jobs)
 
     def query(self, telemetry=False):
         """ Run without actions. Dryrun true. """
