@@ -94,14 +94,14 @@ class Sweeper:
         action = partial(
             c7n_broom.actions.query, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return deque(self._exec(action, self.jobs))
+        self._exec(action, self.jobs)
 
     def execute(self, telemetry=False):
         """ Run actions. Dryrun false. """
         action = partial(
             c7n_broom.actions.execute, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        return deque(self._exec(action, self.jobs))
+        self._exec(action, self.jobs)
 
     def gen_reports(self, fmt="md", report_dir=None):
         """ Generate reports. Markdown by default. """
