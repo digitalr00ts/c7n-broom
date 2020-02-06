@@ -30,17 +30,13 @@ def account_c7nconfigs(
     # TODO: remove skip regions in favor of setting regions in broom config
     regions = Ec2(name).available_regions if not skip_regions else list()
 
+    # TODO: move to a more generalize factory and refrain from creating C7nCfg directly.
     c7n_home = global_settings.get("c7n_home")
     c7nconfig_kwargs = {
         "profile": name,
         "regions": regions,
         "metrics_enabled": False,
         "output_dir": str(Path(c7n_home).joinpath(name)) if c7n_home else "",
-        "cache": str(
-            Path(c7n_home).joinpath(name).joinpath("cloud-custodian").with_suffix(".cache")
-        )
-        if c7n_home
-        else None,
     }
     c7nconfig_kwargs.update(global_settings.get("c7n", dict()))
     c7nconfig_kwargs.update(account_settings.get("c7n", dict()))
