@@ -51,7 +51,7 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     resource_type: Optional[str] = None
 
     cache_period: int = 15
-    cache: Optional[str] = None
+    cache: Optional[Path] = None
 
     # Report
     format: str = "simple"
@@ -85,9 +85,13 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         self.regions = set(self.regions)
 
         if self.cache is None:
-            self.cache = str(c7n_home.joinpath("cloud-custodian.cache"))
+            self.cache = (
+                c7n_home.joinpath(self._s_profiles)
+                .joinpath("cloud-custodian")
+                .with_suffix(".cache")
+            )
 
-        if self.output_dir == "":
+        if not self.output_dir:
             self.output_dir = str(c7n_home)
 
         if not self.configs:
@@ -114,14 +118,16 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         return rtn
 
     @property
+    def _s_profiles(self):
+        return "+".join(map(lambda policy: Path(policy).stem, self.configs))
+
+    @property
     def get_str(self):
         """
         Returns a string for the c7n_config.
         Used for creating files names.
         """
-        return ":".join(
-            [self.profile, ", ".join(map(lambda policy: Path(policy).stem, self.configs)),]
-        )
+        return f"{self.profile}:{self._s_profiles}"
 
     def get_config_data(self) -> Iterable[Dict[str, Any]]:
         """ Returns iterable of dict for all files in self.config """
@@ -148,11 +154,15 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
         if isinstance(self.raw, IOBase):
             raise RuntimeError(f"Cannot serialize type IOBase. Raw is set to {self.raw}")
 
-        # Set is not JSON serializable
-        tmpdata = {
-            key_: list(val_) if isinstance(val_, abc.Set) else val_
-            for key_, val_ in asdict(self).items()
-        }
+        # Set and Path are not JSON serializable
+        tmpdata = dict()
+        for key_, val_ in asdict(self).items():
+            tmp_ = None
+            if isinstance(val_, abc.Set):
+                tmp_ = list(val_)
+            elif isinstance(val_, Path):
+                tmp_ = str(val_)
+            tmpdata[key_] = tmp_ if tmp_ else val_
         # PosixPath is not JSON serializable
         tmpdata["configs"] = [str(cfg_) for cfg_ in self.configs]
 
