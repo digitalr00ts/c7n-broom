@@ -68,30 +68,9 @@ class Sweeper:
 
     def _exec(self, action, jobs, batch: Optional[str] = None):
         """ Multiprocess actions """
-        # It was believed that:
-        # Because of session caching in c7n, we batch by profile and account
-        # Leaving code until confident it is not needed.
-        batch_len = len(self._get_job_settings(batch, jobs)) if batch else 0
-        if batch_len > 1:
-            _LOGGER.debug("Found %s %ss", batch_len, batch)
-            # files = map(
-            #     lambda jobs_: self._exec(
-            #         action, jobs_[1], batch=None if batch == "account_id" else "account_id",
-            #     ),
-            #     self._asdict_by_attrib(batch).items(),
-            # )
-            # return chain.from_iterable(files)
-            for batch_group_ in self._asdict_by_attrib(batch).items():
-                _LOGGER.debug("Run batch for %s.", batch_group_[0])
-                self._exec(action, batch_group_[1], batch=None)
-
-        else:
-            _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
-            # There are bug's in c7n's cache so lets not use it
-            for cf_ in filter(lambda ca_: Path(ca_).is_file(), self._get_job_settings("cache")):
-                Path(cf_).unlink()
-            with ThreadPoolExecutor(max_workers=3) as executor:
-                executor.map(action, jobs)
+        _LOGGER.debug("Processing %s %s jobs.", len(jobs), action.__class__.__name__)
+        with ThreadPoolExecutor() as executor:
+            executor.map(action, jobs)
 
     def query(self, telemetry=False):
         """ Run without actions. Dryrun true. """
