@@ -84,7 +84,7 @@ class Sweeper:
         else:
             _LOGGER.debug("Processing %s %s jobs.", len(jobs), action)
             # There are bug's in c7n's cache so lets not use it
-            for cf_ in filter(lambda cf_: Path(cf_).is_file(), self._get_job_settings("cache")):
+            for cf_ in filter(lambda ca_: Path(ca_).is_file(), self._get_job_settings("cache")):
                 Path(cf_).unlink()
             with ThreadPoolExecutor(max_workers=3) as executor:
                 executor.map(action, jobs)
