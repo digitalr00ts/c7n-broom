@@ -10,6 +10,7 @@ from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Union
 
+from boto_remora.aws import Sts
 import c7n.config
 import yaml
 from vyper import Vyper
@@ -79,6 +80,9 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
     def __post_init__(self):
         if not self.profile:
             raise TypeError("Profile must be set.")
+
+        if self.profile and not self.account_id:
+            self.account_id = Sts(profile_name=self.profile).caller_identity.get("Account")
 
         c7n_home = Path.home().joinpath(".cache/c7n").joinpath(self.profile)
 
