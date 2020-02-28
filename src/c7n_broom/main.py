@@ -1,13 +1,13 @@
 """ Main module for c7n_broom """
 import logging
 from collections import defaultdict, deque
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures.thread import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from functools import partial
-from itertools import chain
 from os import PathLike
 from pathlib import Path
-from typing import Any, Dict, Iterator, Optional, Sequence, Set, Union
+from typing import Any, Dict, Iterator, Mapping, Optional, Sequence, Set, Union
 
 from vyper import Vyper
 
@@ -18,6 +18,26 @@ from c7n_broom.data import count
 
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def _trun(action: c7n_broom.actions, jobs: Sequence[C7nCfg]):
+    """ Multi-threaded actions """
+    _LOGGER.debug("Processing %s %s jobs.", len(jobs), action.__class__.__name__)
+    with ThreadPoolExecutor() as executor:
+        executor.map(action, jobs)
+
+
+def _account_batch_run(action: c7n_broom.actions, jobs: Mapping[str, C7nCfg]):
+    """
+    Multiprocess actions batched by account
+    to get around caching sessions issue
+    """
+    _LOGGER.debug(
+        "Processing %s jobs for %s.", action.__class__.__name__, jobs.keys()
+    )
+    exec_ = partial(_trun, action)
+    with ProcessPoolExecutor as executor:
+        executor.map(exec_, jobs.values())
 
 
 @dataclass()
@@ -57,34 +77,31 @@ class Sweeper:
 
     def _asdict_by_attrib(self, attribute: str):
         rtn = defaultdict(deque)
-        for job_ in self.jobs:
-            rtn[str(getattr(job_, attribute))].append(job_)
+        _ = [rtn[str(getattr(job_, attribute))].append(job_) for job_ in self.jobs]
         return rtn
+
+    def _run(self, action):
+        jobmap = self._asdict_by_attrib("account_id")
+        return _account_batch_run(action, jobmap) if len(jobmap) > 1 else _trun(action, self.jobs)
 
     def get_account_jobs(self, account: str, use_profile: bool = True) -> Iterator[C7nCfg]:
         """ Get an iterator of only jobs for an account """
         attrib = "profile" if use_profile else "account_id"
         return self._filter_by_attrib(attribute=attrib, attribute_val=account)
 
-    def _exec(self, action, jobs, batch: Optional[str] = None):
-        """ Multiprocess actions """
-        _LOGGER.debug("Processing %s %s jobs.", len(jobs), action.__class__.__name__)
-        with ThreadPoolExecutor() as executor:
-            executor.map(action, jobs)
-
     def query(self, telemetry=False):
         """ Run without actions. Dryrun true. """
         action = partial(
             c7n_broom.actions.query, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        self._exec(action, self.jobs)
+        return self._run(action)
 
     def execute(self, telemetry=False):
         """ Run actions. Dryrun false. """
         action = partial(
             c7n_broom.actions.execute, data_dir=self.data_dir, telemetry_disabled=not telemetry,
         )
-        self._exec(action, self.jobs)
+        return self._run(action)
 
     def gen_reports(self, fmt="md", report_dir=None):
         """ Generate reports. Markdown by default. """
@@ -108,7 +125,7 @@ class Sweeper:
         """ Return count of resources from all jobs """
         func = count if grouped else len
         data = map(
-            lambda job_: (job_.get_str, func(get_data_map(job_, data_path=self.data_dir))),
+            lambda job_: (job_.get_str, func(get_data_map(job_, data_path=self.data_dir)),),
             self.jobs,
         )
         return dict(data)
