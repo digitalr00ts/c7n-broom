@@ -4,6 +4,7 @@ import itertools
 import logging
 import os
 from collections import abc, deque
+from contextlib import suppress
 from dataclasses import asdict, dataclass
 from io import IOBase
 from os import PathLike
@@ -13,6 +14,7 @@ from typing import Any, Dict, Iterable, List, Optional, Union
 import c7n.config
 import yaml
 from boto_remora.aws import Sts
+from botocore.exceptions import ProfileNotFound
 from vyper import Vyper
 
 
@@ -82,7 +84,8 @@ class C7nCfg:  # pylint: disable=too-many-instance-attributes
             raise TypeError("Profile must be set.")
 
         if self.profile and not self.account_id:
-            self.account_id = Sts(profile_name=self.profile).caller_identity.get("Account")
+            with suppress(ProfileNotFound):
+                self.account_id = Sts(profile_name=self.profile).caller_identity.get("Account")
 
         c7n_home = Path.home().joinpath(".cache/c7n").joinpath(self.profile)
 
