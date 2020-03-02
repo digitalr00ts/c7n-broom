@@ -150,7 +150,7 @@ def get_table(c7n_config, fmt: str = "simple", data_path: str = "data") -> str:
 
 
 def write(
-    c7n_config, fmt: str = "md", data_path: str = "data", output_path: PathLike = "reports"
+    c7n_config, fmt: str = "md", data_path: str = "data", output_path: PathLike = "reports",
 ) -> Optional[PathLike]:
     """ Write report file """
     Path(output_path).mkdir(parents=True, exist_ok=True)

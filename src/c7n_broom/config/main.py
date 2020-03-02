@@ -10,9 +10,9 @@ from os import PathLike
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Union
 
-from boto_remora.aws import Sts
 import c7n.config
 import yaml
+from boto_remora.aws import Sts
 from vyper import Vyper
 
 

@@ -32,9 +32,7 @@ def _account_batch_run(action: c7n_broom.actions, jobs: Mapping[str, C7nCfg]):
     Multiprocess actions batched by account
     to get around caching sessions issue
     """
-    _LOGGER.debug(
-        "Processing %s jobs for %s.", action.__class__.__name__, jobs.keys()
-    )
+    _LOGGER.debug("Processing %s jobs for %s.", action.__class__.__name__, jobs.keys())
     exec_ = partial(_trun, action)
     with ProcessPoolExecutor() as executor:
         executor.map(exec_, jobs.values())
