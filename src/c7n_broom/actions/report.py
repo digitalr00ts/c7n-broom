@@ -62,6 +62,9 @@ class ResourceKeys(ExtendedEnum):
         date="CreationDate",
         # extras=(("BlockDeviceMappings", "BlockDeviceMappings"),)
     )
+    asg = ResourceKey(
+        id="AutoScalingGroupARN", name="AutoScalingGroupName", date="CreatedTime", region="SKIP"
+    )
     ebs = ResourceKey(
         id="VolumeId",
         type=_cap_1letter(AWSResourceKeys.EBS.value.key),  # pylint: disable=no-member
