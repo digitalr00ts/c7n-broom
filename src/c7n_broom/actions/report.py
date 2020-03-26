@@ -53,6 +53,7 @@ class ResourceKey:  # pylint: disable=too-many-instance-attributes
         return ResourceKeyDict(rtn_data)
 
 
+# TODO: Move to external definition file
 class ResourceKeys(ExtendedEnum):
     """ Descriptions of resources used in report generation """
 
@@ -64,6 +65,12 @@ class ResourceKeys(ExtendedEnum):
     )
     asg = ResourceKey(
         id="AutoScalingGroupARN", name="AutoScalingGroupName", date="CreatedTime", region="SKIP"
+    )
+    launch_config = ResourceKey(
+        id="LaunchConfigurationARN",
+        name="LaunchConfigurationName",
+        date="CreatedTime",
+        region="SKIP",
     )
     ebs = ResourceKey(
         id="VolumeId",
